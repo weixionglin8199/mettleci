@@ -1,0 +1,15 @@
+---
+given:
+- stage: "Input1"
+  link: "Load"
+  path: "Input1-Load.csv"
+when:
+  job: "mci_test_ronnyz"
+  controller: null
+  parameters: {}
+then:
+- stage: "Output1"
+  link: "Load"
+  path: "Output1-Load.csv"
+  cluster: null
+  ignore: null

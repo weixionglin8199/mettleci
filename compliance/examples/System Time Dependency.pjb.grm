@@ -1,0 +1,40 @@
+/*
+ * Identifies the use of system time in the job
+ *
+ * Rationale:
+ * Jobs with date logic that reads from the system time make it difficult to perform repeatable/automated 
+ * testing.  Instead of using system date functions, it is recommended that the current date be passed in 
+ * as a job parameter or derived from one of the DSJobStart* macros. During unit testing, the job parameter
+ * or DSJobStart* macro can be set to a fixed value. The actual job results can then be compared with 
+ * the expected results without needing to account for differences due to system time. 
+ */
+ 
+def systemTimeFunctions = [
+    "current_date",
+    "system_time_date",
+    "current_time",
+    "current_timestamp"
+]
+
+def functionUsed = []
+
+item.graph.V.stage.as("stage").out.metabag.filter { metabag ->
+    
+    functionUsed = []
+    def transformCode = metabag.property("APT.TrxGenCode").next()
+    
+    if(transformCode) {
+        for(function in systemTimeFunctions){
+            if(transformCode.contains(function)){
+                functionUsed.add(function)
+            }
+        }
+    }
+    
+    return functionUsed.size() > 0
+    
+}.back("stage")
+	.comply{ "${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' uses system clock function '" + functionUsed.toString() + "'. This call should be replaced with a job parameter or source data mapping to support repeatable unit testing." }
+	
+
+

@@ -1,0 +1,65 @@
+/*
+ * Schema Files
+ *
+ * Rationale:
+ * In the Upgrade scenario, Schema Files are file system assets 
+ * that need to be managed and migrated seperately 
+ *
+ */
+
+ // stage to file property mapping
+def stageProperties = [
+    'PxSequentialFile'              : 'schemafile'   ,
+    'PxColumnImport'                : 'schemafile' 
+]
+
+
+ def fileStage = { stage ->
+
+     // the properties for this stage type
+    def propertyName = stageProperties[stage.stageType]
+
+    // check if the stage is in the list of stage properties
+    if (!propertyName) {
+        return false
+    }
+
+    // check if the stage has an output link
+    if(!stage.out.pin) {
+        return false
+    }
+
+    // check if the stage is a sequential file
+    if( 'PxSequentialFile'.equalsIgnoreCase(stage.stageType) ) {
+        // drill down to the pin to retrieve the limit properties
+
+        if( stage.out.pin.property(propertyName).next() ) {
+            return true
+        }
+    } else {
+        // file is not a sequential file
+
+        if ( stage.property(propertyName).next() ) {
+            return true
+        }
+    }
+
+    return false
+}
+
+item.graph.V.stage.filter(fileStage).comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' uses Schema File '${it.value}'"}
+{ 
+    // build a more detailed compliance error message
+
+    // the properties for this stage type
+    def propertyName = stageProperties[it.stageType]
+    
+    if ('PxSequentialFile'.equalsIgnoreCase(it.stageType)) {
+        it.value = it.out.pin.property(propertyName).next()
+    } else {
+        it.value = it.property(propertyName).next()
+    }
+    
+    return false
+};
+

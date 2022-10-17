@@ -1,0 +1,47 @@
+/*
+* Checks whether a job has too many stages
+*
+* Rationale:
+* A job that contains too many stages becomes hard to maintain.  Not only is it difficult to 
+* follow the logic but even physically moving around it and finding specific logic is hard.
+*  
+* This rule detects when a job or local container exceeds a globally configurable stage limit.
+* The default "stageLimit" parameter is set to 25 but can be easily adjusted as required.
+*/
+
+// maximum allow stages
+def stageLimit = 24
+
+def hasFailure = false
+def stageCount = item.graph.V.stage.count()
+
+// gather all (local) containers
+item.graph.V.container.transform { container ->
+
+    // calculate the stage count for this container
+    container.stageCount = container.out.stage.as('stage').both.stage.dedup().loop('stage'){true}{true}.dedup().count()
+    
+    // check if container exceeds stage limit
+    if (container.stageCount > stageLimit) {
+        compliance.failure("Local container '${container.fullQualifiedName}' has ${container.stageCount} stages. ")
+        hasFailure = true
+    }
+    
+    return container
+}
+.gather { containers ->
+    // adjust the job stage counts to ignore those in local containers
+    stageCount -= containers.stageCount.sum()
+}
+.iterate()
+
+// check job stage count does not exceed limit
+if (stageCount > stageLimit) {
+    compliance.failure("Job has ${stageCount} stages.")
+    hasFailure = true
+}
+
+// include stage limit in error message
+if (hasFailure) {
+    compliance.failure("The number of stages per job or container should not exceed ${stageLimit}. ")
+}

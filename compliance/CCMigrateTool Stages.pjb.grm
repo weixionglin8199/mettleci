@@ -1,0 +1,51 @@
+/*
+* This rule detects the use of DEPRECATED stages in Parallel Jobs
+* and suggests the recommended alternative
+*
+* Rationale:
+* From time to time, older Stage Types are updated/replaced. 
+* While the older Stage Types will continue to function, it is recommended to use the newer replacement Stage Types
+*
+* HOW TO USE
+* If the client is running 11.7 or higher, don't comment out any rules
+* If the client is running 9.1, comment out all the 11.7 rules
+* If the client is running 8.7, comment out all the 9.1 and 11.7 rules
+* If the client is running 8.5, comment out all the 8.7 and 9.1 rules
+* If the client is running below 8.5, comment out all the rules [but tell them to get an upgrade ;)]
+*
+*/
+
+def map = [
+    'DSDB2PX'           : 'replaced by a DB2 Connector',             // From Version 8.5, DB2 UDB API Stage has been DEPRECATED
+    'UDBLoadPX'         : 'replaced by a DB2 Connector',             // From Version 8.5, DB2 UDB Load has been DEPRECATED
+    'PxDB2'             : 'replaced by a DB2 Connector',
+    'PxDB2Z'            : 'replaced by a DB2 Connector',             // From Version 8.5, DB2Z has been DEPRECATED
+    'DRSPX'             : 'replaced by a DRS Connector',             // From Version 8.5, Dynamic RDBMS has been DEPRECATED
+    'PxOracle'          : 'replaced by an Oracle Connector',          // From Version 8.5, Oracle Enterprise has been DEPRECATED
+    'ORAOCIBLPX'        : 'replaced by an Oracle Connector',          // From Version 8.5, Oracle OCI Bulk Load has been DEPRECATED
+    'TeradataPX'        : 'replaced by a Teradata Connector',        // From Version 8.5, Teradata API has been DEPRECATED
+    'PxTeradata'        : 'replaced by a Teradata Connector',        // From Version 8.5, Teradata Enterprise has been DEPRECATED
+    'TerabulkPX'        : 'replaced by a Teradata Connector',        // From Version 8.5, Teradata Load has been DEPRECATED
+    'TDMLoadPX'         : 'replaced by a Teradata Connector',        // From Version 8.5, Teradata Multiload has been DEPRECATED
+    'MQSeriesPX'        : 'replaced by a WebSphere MQ Connector',    // Version 11.7
+    'MQRead'            : 'replaced by a WebSphere MQ Connector',
+    'PxUnitOfWork'      : 'replaced by a Distributed Transaction Stage',
+    'HBaseConnectorPX'  : 'upgraded to the latest version',
+    'PxOdbc'            : 'replaced by an ODBC Connector',            // From Version 8.7, ODBC Enterprise has been DEPRECATED
+    'JClientPX'         : 'replaced by a Java Integration',          // From Version 9.1, Java Client has been DEPRECATED
+    'JTransformerPX'    : 'replaced by a Java Integration',          // From Version 9.1, Java Transformer has been DEPRECATED
+    'PxNetezza'         : 'replaced by a Netezza Connector',         // From Version 9.1, Netezza Enterprise has been DEPRECATED
+    'Pxsqlsvr'          : 'replaced by an ODBC Connector'             // From Version 9.1, SQLServer Enterprise has disappeared completely
+]
+
+item.graph.V.stage.comply{"CCMigrate will replace ${config.readableStageTypes[it.stageType] ?: it.stageType} stage '${it.stageName}' with a ${it.replacement} stage."} { 
+    
+    def replacement = map[it.stageType];
+    
+    if (replacement) {
+        it.replacement = replacement
+        return false
+    }
+    
+    return true
+};

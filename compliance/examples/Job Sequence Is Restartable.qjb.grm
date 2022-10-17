@@ -1,0 +1,17 @@
+/*
+ * Verifies that a job sequence is restartable
+ *
+ * Rationale:
+ * Sequence jobs can be configured to record checkpoint information so that you can restart a failed sequence
+ * from the point at which it failed. You can enable or disable checkpoint recording at a project-wide level, 
+ * or for individual sequence jobs. This compliance rule verififies that this setting has been set for a
+ * specified job sequence. 
+ */
+
+if (
+    item.properties.jobSeqCodeGenOpts == null ||
+    item.properties.jobSeqCodeGenOpts.contains("checkpoints") == false
+) {
+    compliance.failure("Job Sequence is not restartable on failure.");
+    return;
+}

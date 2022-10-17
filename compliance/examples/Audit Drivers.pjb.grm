@@ -1,0 +1,13 @@
+/*
+ * Checks that a job has at least input "driver" that is identified by the "in%" link naming standard
+ *
+ * Rationale:
+ * Our audit reports show the lineage of how row counts change from source to target.  For this to work
+ * effectively, the system needs to be able to differentiate between inputs that have an impact on row 
+ * counts (drivers) and those that don't (lookups or left joins).  
+ *
+ * A job with no "in%" or driver links indicates that a job has been developed without considering
+ * how it will work in conjunction with the audit reports.
+ */
+if (item.graph.E.link.filter{ it.linkName ==~ /in([A-Z].*)/ }.count() == 0)
+  compliance.failure("Job must have at least one driver")

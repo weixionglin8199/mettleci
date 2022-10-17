@@ -1,0 +1,135 @@
+/*
+ * SQL in DB Connectors
+ *
+ * Rationale:
+ * Check for SQL usage on DB connectors and stages. Developers should 
+ * avoid using SQL to filter data and instead utilize Datastage's features
+ *
+ * This currently only allows generated SQL where there are no other clauses specified in stages with that option.
+ * Any use-defined SQL, generated SQL with additional clauses or query file inputs will fail. 
+ *
+ */
+
+ // stage to file property mapping
+def connectorProperties = [
+   'DB2Connector',
+   'DRSConnector',
+   'NetezzaConnector',
+   'ODBCConnector', 
+   'OracleConnector',
+   'TeradataConnector'
+] as Set
+
+def type1Stages = [
+    'CODBCStage', // ODBC Data Access
+    'CUvStage' // Universe Data Access
+] as Set
+
+def type2Stages = [
+    'DSDB2', // DB2 Stage has been deprecated
+    'DRS', // Dynamic RDBMS Stage has been DEPRECATED
+    'InfmxCLI', // Informix Data Access
+    'ORAOCI9', // Oracle OCI Load has been DEPRECATED 
+    'SYBASEOC', // Sybase Data Access
+    'Teradata' // Teradata Stage has been DEPRECATED
+] as Set
+
+def type3Stages = [
+    'CUniDataStage' // Unidata Data Access
+] as Set
+
+
+ def DBStage = { stage ->
+
+    def userModeFlag = null;
+
+    // Check against Connectors
+    if (connectorProperties.contains(stage.stageType)) {
+		if (stage["XMLProperties"] != null) {
+			return (stage["XMLProperties"]?.toString().toLowerCase().replace('\n',' ').matches("^.*select.* from .*\$"));
+		} else {
+			return false;
+		}   
+    }
+
+    // Each of the older and deprecated Stages will be one of a couple of styles 
+    def sqlModeFlag = null;
+
+    if (type1Stages.contains(stage.stageType)) {
+        def userDefSQLFlag = stage.out.pin.property("SqlUser").next();
+
+        if (!userDefSQLFlag) {
+            return false;
+        }
+
+        def isUserDefSQL = userDefSQLFlag.toString() == '1'? true:false;
+
+        if (isUserDefSQL) {
+        
+//          Leave this here in case we decide in the future to get more flexible in allowing user-defined/built SQL
+//          that is merely SELECT ... FROM ...; with no adjustments, joins, filters etc.
+//          def sqlPrimary = stage.out.pin.property("SQLPrimary").collect().join(" ").replace("null","");
+//          def sqlRef = stage.out.pin.property("SQLRef").collect().join(" ").replace("null","");
+
+            return true;
+        } else {
+            def whereClause = stage.out.pin.property("SqlWhere").next();
+            def otherClauses = stage.out.pin.property("SqlExtra").next();
+            def lenWhere = whereClause?whereClause.toString().replace("null","").trim().length():0;
+            def lenOther = otherClauses?otherClauses.toString().replace("null","").trim().length():0;
+
+            return (lenWhere > 0 || lenOther > 0);
+        }
+    }
+
+    if (type2Stages.contains(stage.stageType)) {
+        switch(stage.out.pin.property("GENSQL").next().toString().toLowerCase()) {
+            case "yes":
+            case "y": 
+                sqlModeFlag = "Generated";
+                break;
+            case "no":
+            case "n":
+                sqlModeFlag = "User";
+                break;
+            case "sqlfile":
+                sqlModeFlag = "File";
+                break;
+            case "fullygensql":
+                sqlModeFlag = "Build";
+                break;
+            default:
+                return false;
+        }
+
+        if (sqlModeFlag == "Generated") {
+            def whereClause = stage.out.pin.property("WHERE_CLAUSE").next() ;
+            def otherClauses = stage.out.pin.property("OTHER_CLAUSES").next();
+            def lenWhere = whereClause?whereClause.toString().replace("null","").trim().length():0;
+            def lenOther = otherClauses?otherClauses.toString().replace("null","").trim().length():0;
+
+            return (lenWhere > 0 || lenOther > 0);
+        } else {
+        
+//          Leave this here in case we decide in the future to get more flexible in allowing user-defined/built
+//          SQL that is merely SELECT ... FROM ...; with no adjustments, joins, filters etc
+
+            return true;
+        }
+    }
+
+    if (type3Stages.contains(stage.stageType) && stage.out) {
+        def selection = stage.out.pin.property("Selection").next();
+
+        if (!selection || selection.toString().trim().length() == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+item.graph.V.stage.filter(DBStage)
+    .comply{"${config.readableStageTypes[it.stageType] ?: it.stageType}  '${it.stageName}' is using SQL SELECT."}

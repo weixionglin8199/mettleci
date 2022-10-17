@@ -1,0 +1,39 @@
+/*
+ * Verifies that Audit Monitors has been correctly configured in a given job
+ *
+ * Rationale:
+ * The audit reports rely on matching metadata in the job description with job links
+ * using a set of defined naming standards. When job description and link metadata 
+ * cannot be associated, the audit report will not produce sensible results
+ *
+ * This compliance rule has been designed to identify these sort of problems at 
+ * job design time rather than trying to debug unexpected audit reports after executing
+ * an end-to-end execution.
+ */
+def auditLinks = [ /mon[A-Z].*/ ]
+def monitors = item.audit.monitors.collectEntries{ [(it.id): false] }
+
+item.graph.E.link
+  .filter { link ->
+    // filter everything that is not an audit link
+    auditLinks.find{ link.linkName ==~ it } != null
+  }
+  .comply{"Audit link ${it.outV.stageName}.${it.linkName} must include a Monitor Id"} { link ->	
+    // valid post-fix?
+    link.linkName ==~ /.*([0-9]{3})/
+  }
+  .comply{"Audit link ${it.outV.stageName}.${it.linkName} must have a valid Monitor job description entry"} { link ->						
+    // capture the id prefix
+    def id = (link.linkName =~ /.*([0-9]{3})/)
+		
+    // no monitor with id in job description, not compliant
+    if (!monitors.containsKey(id[0][1])) return false 
+	
+    monitors[id[0][1]] = true
+    return true
+  }
+  .iterate()
+	
+monitors.each{ monitor, used ->
+  if (!used) compliance.failure("Monitor id=$monitor is defined but never used")
+}

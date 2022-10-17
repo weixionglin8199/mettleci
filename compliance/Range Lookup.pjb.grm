@@ -1,0 +1,41 @@
+/*
+ * Checks that Range lookups are correctly setup
+ *
+ * Rationale:
+ * When setting up a range lookup, DataStage will build the lookup table based
+ * on the primary key fields but not the range fields.  If the range option
+ * is enabled on the reference link, this will result in "duplicates" being 
+ * ignored and the range lookup won't work as expected.
+ *
+ * This rule will check that range lookups have been configured to allow
+ * duplicates on the reference link and prevent unexpected results due to 
+ * an incorrectly configured stage.
+ */
+ 
+// find transformer based lookup stages
+item.graph.V.stage.has('stageType', 'PxLookup').as("stage")
+    .out.metabag
+        .has('APT.LookupOperator', 'transform')
+        .back("stage")
+        
+    .in.pin.as("pin")
+        .out.metabag.filter{ metabag ->
+            def lookupOptions = metabag."APT.LookupOptions"
+
+            // check metabag for use of range lookup and allow duplicate flags
+            if (lookupOptions) {
+                return lookupOptions.contains("-range") && !lookupOptions.contains("-allow_dups")
+            }
+            return false
+
+        }.back("pin")
+    .comply{ pin ->
+        // collect attributes from multiple graph elements to build a meaningful failure message
+        t = new Table()
+        pin.out
+            .stage.stageName.as("stage").back(3)
+            .inE.linkName.as("link")
+            .table(t).iterate()
+        
+        return "Range lookup ${t.get(0, 'stage')}.${t.get(0, 'link')} is configured without 'allow duplicates'."
+    }

@@ -1,0 +1,105 @@
+/*
+*
+* Default Stage Names for Server Jobs
+*
+* Rationale:
+* Stages should be given meanigful names, to improve readability and reduce bug-fixing effort.
+* Suggests they might possibly be "not quite finished".
+*
+*/
+
+def map = [
+// Server ---------------------------------------------------------------------
+'AGGREGATOR'                     : 'Aggregator_'   , // Form Groups Or Perform Other Aggregate Functions
+'BCPLOAD'                        : 'Sybase_BCP_Load_'  , // Sybase Sql Server Bulk Loader
+'CCollector'                     : 'Link_Collector_'  , // Merge Up To 64 Links Into Single Output Link
+'CFF'                            : 'Complex_Flat_File_'  , // Complex Flat File Stage.
+'CHashedFileStage'               : 'Hashed_File_'   , // Typically A Keyed Reference File
+'CInterProcess'                  : 'InterProcess_'  , // Communication Channel Between Stages
+'CODBCStage'                     : 'ODBC_' , // ODBC Data Access
+'CPartitioner'                   : 'Link_Partitioner_'  , // Partition Data Out To Multiple Links
+'CSeqFileStage'                  : 'Sequential_File_'  , // Sequential Data Access
+'CUniDataStage'                  : 'UniData_'   , // Unidata Data Access
+'CUDT6Stage'                     : 'UniData_6_' , // Unidata 6 Data Access - from 9.1.2
+'CUvStage'                       : 'UniVerse_'   , // Universe Data Access
+'DB2Connector'                   : 'DB2_Connector_'  , // Ibm Infosphere DB2 Connector
+'DRS'                            : 'Dynamic_RDBMS_'  , // Dynamic RDBMS Stage has been DEPRECATED - Replaced By the Dynamic RDBMS Connector Stage
+'DRSConnector'                   : 'DRS_Connector_'  , // Dynamic RDBMS Connector
+'DSDB2'                          : 'DB2_UDB_API_Stage_'  , // DB2 Stage has been DEPRECATED - Replaced By The DB2 Connector Stage
+'Folder'                         : 'Folder_'  , // Read Or Write Data As Files In A Directory
+'ftp'                            : 'FTP_Plug_in_'  , // FTP Data Access
+'INFBLK10'                       : 'Informix_Load_'  , // Informix Bulk Loader
+'InfmxCLI'                       : 'Informix_CLI_'  , // Informix Data Access
+'IQBulk12'                       : 'Sybase_IQ_12_Load_'  , // Sybase IQ 12 Bulk Loader
+'JClient'                        : 'Java_Client_'   , // Transformer For Java Passive Plug-In Stage
+'JTransformer'                   : 'Java_Transformer_'   , // Transformer For Java Active Plug-In Stage
+'MERGE'                          : 'Merge_'   , // Merge Data Access
+'NetezzaConnector'               : 'Netezza_Connector_'  , // Netezza Connector
+'ODBCConnector'                  : 'ODBC_Connector_' , // IBM Infosphere ODBC Connector
+'ORAApps'                        : 'Oracle_Applications_Direct_Access_'  , // Oracle Applications Direct Access Stage
+'ORABULK'                        : 'Oracle_7_Load_'  , // Oracle Bulk Loader
+'OracleConnector'                : 'Oracle_Connector_'  , // Oracle Connector
+'orahrchy'                       : 'Oracle_Applications_Hierarchy_'  , // Oracle Applications Hierarchy Stage
+'ORAOCI9'                        : 'Oracle_OCI_'  , // Oracle OCI Stage has been DEPRECATED - Replaced By The Oracle Connector Stage
+'ORAOCIBL'                       : 'Oracle_OCI_Load_'  , // Oracle OCI Bulk Loader Stage has been DEPRECATED - Replaced By The Oracle Connector Stage
+'PeoplesoftOne'                  : 'JD_Edwards_EnterpriseOne_'  , // JD Edwards Enterprise One Stage
+'Pivot'                          : 'Pivot_'   , // Pivot Plugin Version 1.0.0
+'PS_HRY'                         : 'Hierarchy_for_PeopleSoft_Enterprise_'  , // Peoplesoft Enterprise Hierarchy Plug-In
+'rdbload'                        : 'RedBrick_Load_'   , // Redbrick Bulk Loader
+'RowMerger'                      : 'Row_Merger_'   , // Row Merger Active Plug-In Stage
+'RowSplitter'                    : 'Row_Splitter_'   , // Row Splitter Active Plug-In Stage
+'RTIInput'                       : 'ISD_Input_'  , // Information Services Input Stage
+'RTIOutput'                      : 'ISD_Output_'  , // Information Services Output Stage
+'Siebel_BC'                      : 'Siebel_BC_Pack_' , // Siebel Business Component Access Stage
+'Siebel_DA'                      : 'Siebel_DA_Pack_' , // Siebel Direct Access Stage Version 3.2.2
+'Siebel_EIM'                     : 'Siebel_EIM_Pack_' , // Siebel Stage
+'sort'                           : 'Sort_'   , // Sort
+'STP'                            : 'Stored_Procedure_'  , // The Stored Procedure Stage
+'SYBASEOC'                       : 'Sybase_OC_'  , // Sybase Data Access
+'TDMLoad'                        : 'Teradata_Multiload_' , // Teradata Multiload/Tpump/Fastexport Stage.
+'Terabulk'                       : 'Teradata_Load_' , // Teradata Bulk Stage has been DEPRECATED - Replaced By The Teradata Connector Stage
+'Teradata'                       : 'Teradata_API_' , // Teradata Stage has been DEPRECATED - Replaced By The Teradata Connector Stage
+'TeradataConnector'              : 'Teradata_Connector_' , // IBM Infosphere Teradata Connector
+'UDBLoad'                        : 'DB2_UDB_Load_'  , // DB2 UDB Load has been DEPRECATED - Replaced By The DB2 Connector Stage
+'WebSphereMQConnector'           : 'Websphere_MQ_Connector_'   , // IBM Websphere MQ Connector
+'WSClient'                       : 'Web_Services_Client_'  , // Passive Web Service Plug-In Stage
+'WSTransformer'                  : 'Web_Services_Transformer_'  , // Active Web Service Plug-In Stage
+'XMLInput'                       : 'XML_Input_'  , // XML Input Stage
+'XMLOutput'                      : 'XML_Output_'  , // XML Output Stage
+'XMLStage'                       : 'Hierarchical_Data_', // IBM Hierarchical Data Transformer *NEW*
+'XMLTransformer'                 : 'XML_Transformer_'  , // XML Transformer Stage
+'XPSLoad'                        : 'Informix_XPS_Load_'  , // Informix XPS Bulk Loader
+// Processing -----------------------------------------------------------------
+'CTransformerStage'              : 'Transformer_'     // Transformer
+]
+
+// Stages
+item.graph.V.stage.comply{"${it.msg}"} { 
+
+	if (it.stageType != null) {
+		
+		def regex = null;
+		def msg = null;
+
+		if (map.containsKey(it.stageType)) {
+			regex = "^(Copy_([0-9]+_)?of_)?" + map[it.stageType] + "(has_been_DEPRECATED_)?[0-9]+";
+			msg = "${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' uses DataStage's default naming. Please provide a meaningful name meeting naming standards.";
+		} else if (it.stageType == "container") {
+			regex = "^" + it.containerName + "C[0-9]+";
+			msg = "Container ${it.stageName} uses DataStage's default naming. Please provide a meaningful name meeting naming standards.";
+		}
+		
+		if (regex != null) {
+			it.msg = msg;
+			return !it.stageName.matches(regex);
+		}
+		
+	}
+	return true;
+
+}.iterate();
+
+// Links
+item.graph.E.link.comply{"Link ${it.linkName} uses DataStage's default naming. Please provide a meaningful name meeting naming standards."} { 
+	return !it.linkName.matches("^DSLink[1-9][0-9]*");
+};

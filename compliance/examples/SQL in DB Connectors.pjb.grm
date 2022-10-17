@@ -1,0 +1,203 @@
+/*
+ * SQL in DB Connectors
+ *
+ * Rationale:
+ * Check for SQL usage on DB connectors and stages. Developers should 
+ * avoid using SQL to filter data and instead utilize Datastage's features
+ *
+ * This currently only allows generated SQL where there are no other clauses specified in stages with that option.
+ * Any use-defined SQL, generated SQL with additional clauses or query file inputs will fail. 
+ *
+ */
+
+
+ // stage to file property mapping
+def connectorProperties = [
+   'CognosTM1ConnectorPX',  // Provisional. Requires an actual TM1 source to configure.
+   'DB2ConnectorPX',
+   'DRSConnectorPX',
+   'GreenplumConnectorPX',
+   'HiveConnectorPX',
+   'JDBCConnectorPX',
+   'NetezzaConnectorPX',
+   'ODBCConnectorPX',
+   'OracleConnectorPX',
+   'SnowflakeConnectorPX',
+   'TeradataConnectorPX'
+] as Set
+
+defEnterpriseStages = [
+    'PxDB2', 
+    'PxInformixXPS',
+    'PxOdbc',
+    'PxOracle',
+    'Pxsqlsvr',
+    'PxSybase',
+    'PxTeradata'
+] as Set
+
+def type1Stages = [
+    'PXClassicFederation',
+    'Pxiway',
+    'PxNetezza'
+] as Set
+
+def type2Stages = [
+    'DSDB2PX',         // DB2 Stage has been deprecated
+    'DRSPX',           // Dynamic RDBMS Stage has been DEPRECATED
+    'InfmxCLIPX',      // Informix Data Access
+    'SYBASEOCPX',      // Sybase Data Access
+    'TeradataPX'       // Teradata Stage has been DEPRECATED
+] as Set
+
+def type3Stages = [
+    'PxDB2Z' // DB2Z has been DEPRECATED
+] as Set
+
+ def DBStage = { stage ->
+    def userModeFlag = null;
+
+
+    // Check against Connectors
+    if (connectorProperties.contains(stage.stageType)) {
+		if (stage["XMLProperties"] != null) {
+			return (stage["XMLProperties"]?.toString().toLowerCase().replace('\n',' ').matches("^.*select.* from .*\$"));
+		} else {
+			return false;
+		}
+    }
+
+    // Each of the older and deprecated Stages will be one of a couple of styles 
+    def sqlModeFlag = null;
+
+    // Enterprise and Type 1 stages are stored in separate buckets
+    // but handled the same bacause Enterprise stages also have SQL builder mode and Type 1 doesn't.
+    // For the modes we care about, the info for both is stored in the places in the same way.
+    if ((defEnterpriseStages.contains(stage.stageType) 
+        || type1Stages.contains(stage.stageType))
+        &&  (stage.out)) {
+        switch(stage.out.pin.selection.next().toString().toLowerCase()) {
+            case "query": 
+                sqlModeFlag = "Generated"; // Not relevant for Type 3
+                break;
+            case "userquery":
+                sqlModeFlag = "User";
+                break;
+            case "table":
+                sqlModeFlag = "Table";
+                break;
+            case 'sqlbuilder': // Only for Enterprise Stages
+                sqlModeFlag = "Build";
+                break;
+            case "null":
+            case "":  
+                // option doesn't exist. Output not Input.
+                return false;
+            default:
+                sqlModeFlag = "Invalid";
+                break;
+        }
+
+        if (sqlModeFlag == "Generated") {
+            return false;
+        } else if (sqlModeFlag == "Table") {
+            def tableInfo = stage.out.pin.tablename.next();
+            
+            // if a filter has been used it is stored in with the table name
+            def hasSelectClause = (tableInfo.selectlist != null);
+            def hasFilterClause = (tableInfo.filter != null);
+
+            return (hasSelectClause || hasFilterClause);
+        }
+
+        return true;
+    }
+
+    if (type2Stages.contains(stage.stageType) && stage.out) {
+        switch(stage.out.pin.property("GENSQL").next().toString().toLowerCase()) {
+            case "yes":
+            case "y": 
+                sqlModeFlag = "Generated";
+                break;
+            case "no":
+            case "n":
+                sqlModeFlag = "User";
+                break;
+            case "sqlfile":
+                sqlModeFlag = "File";
+                break;
+            case "fullygensql":
+                sqlModeFlag = "Build";
+                break;
+            case "null":
+            case "": 
+                // option doesn't exist. Output not Input.
+                return false;
+            default:
+                sqlModeFlag = "Invalid";
+                break;
+        }
+
+        if (sqlModeFlag == "Generated") {
+            def whereClause = stage.out.pin.property("WHERE_CLAUSE").next();
+            def otherClauses = stage.out.pin.property("OTHER_CLAUSES").next();
+
+            def lenWhere = 0;
+            if (whereClause) {
+                lenWhere = whereClause.toString().replace("null","").trim().length();
+            }
+
+            def lenOther = 0;
+            if (otherClauses) {
+                lenOther = otherClauses.toString().replace("null","").trim().length();
+            }
+
+            return (lenWhere > 0 || lenOther > 0);
+            
+        } else {
+        
+//          Leave this here in case we decide in the future to get more flexible in allowing user-defined/built SQL
+//          that is merely SELECT ... FROM ...; with no adjustments, joins, filters etc.
+//          Depending on the mode, it uses USERSQL, FULLYGENSQL or SQLBUILDERSQL. Beware if the mode has been changed
+//          in the designer after initially being saved, the ISX retains the old txt in the old field. e.g.
+//          def userSQL = stage.out.pin.property("USERSQL").next().toString().replace("null","");
+
+            return true;
+            
+        }
+    }
+
+    if (type3Stages.contains(stage.stageType) && stage.out) {
+        switch(stage.out.pin.property("selection").next().toString().toLowerCase()) {
+            case "userquery":
+                sqlModeFlag = "User";
+                break;
+            case "table":
+                sqlModeFlag = "Table";
+                break;
+            case "null": // option doesn't exist. Output not Input.
+                return false;
+            default:
+                sqlModeFlag = "Invalid";
+                break;
+        }
+
+        if (sqlModeFlag == "Table") {
+            def tableInfo = stage.out.pin.property("table").next();
+
+            // if a filter has been used it is stored in with the table name
+            def hasSelectClause = (tableInfo.selectlist != null);
+            def hasFilterClause = (tableInfo.filter != null);
+            def hasOrderClause = (tableInfo.orderby != null);
+
+            return (hasSelectClause || hasFilterClause || hasOrderClause);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+item.graph.V.stage.filter(DBStage)
+    .comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' is using a SQL SELECT."}

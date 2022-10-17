@@ -1,0 +1,42 @@
+/*
+* This rule detects the use of DEPRECATED stages in Server Jobs
+* and suggests the recommended alternative
+*
+* Rationale:
+* From time to time, older Stage Types are updated/replaced. 
+* While the older Stage Types will continue to function, it is recommended to use the newer replacement Stage Types
+*
+* HOW TO USE
+* If the client is running 11.7 or higher, don't comment out any rules
+* If the client is running 9.1, comment out all the 11.7 rules
+* If the client is running 8.7, comment out all the 9.1 and 11.7 rules
+* If the client is running 8.5, comment out all the 8.7 and 9.1 rules
+* If the client is running below 8.5, comment out all the rules [but tell them to get an upgrade ;)]
+*
+*/
+
+def map = [
+    'DRS'               : 'replaced by a DRS Connector',              // From Version 8.5, Dynamic RDBMS has been DEPRECATED
+    'DSDB2'             : 'replaced by a DB2 Connector',              // From Version 8.5, DB2 UDB API Stage has been DEPRECATED
+    'UDBLoad'           : 'replaced by a DB2 Connector',              // From Version 8.5, DB2 UDB Load has been DEPRECATED
+    'CODBCStage'        : 'replaced by an ODBC Connector',
+    'ORAOCI9'           : 'replaced by an Oracle Connector',          // From Version 8.5, Oracle OCI Load has been DEPRECATED
+    'ORAOCIBL'          : 'replaced by an Oracle Connector',          // From Version 8.5, Oracle OCI Bulk Load has been DEPRECATED
+    'Terabulk'          : 'replaced by a Teradata Connector',         // From Version 8.5, Teradata Load has been DEPRECATED
+    'Teradata'          : 'replaced by a Teradata Connector',         // From Version 8.5, Teradata has been DEPRECATED
+    'TDMLoad'           : 'replaced by a Teradata Connector',         // From Version 8.5, Teradata has been DEPRECATED
+    'MQSeries'          : 'replaced by a WebSphere MQ Connector',     // From Version 11.7
+    'CUDT6Stage'        : 'replaced by a UniData Stage'               //
+]
+
+item.graph.V.stage.comply{"CCMigrate will replace ${config.readableStageTypes[it.stageType] ?: it.stageType} stage '${it.stageName}' with a ${it.replacement} stage."} { 
+    
+    def replacement = map[it.stageType];
+    
+    if (replacement) {
+        it.replacement = replacement
+        return false
+    }
+    
+    return true
+};

@@ -1,0 +1,25 @@
+/*
+ * Verifies that there is only one data flow in a DataStage job
+ *
+ * Rationale:
+ * A DataStage job has no restrictions on the number of independent data flows that can be created. 
+ * Ideally a DataStage job should be created for each data flow to allow the calling application
+ * to manage the execution order.
+ */
+
+// count the total number of stages in the graph
+def totalStageCount = item.graph.V.stage.count()
+
+// if there are no stages, assume the rule is not relavent to this job
+if (totalStageCount == 0) return
+
+// get the name of the first stage
+def myStage = item.graph.V.stage(1).stageName.next()
+
+// count how many stages are connected to the first stage
+def stageConnectedCount = item.graph.V('stageName', myStage).as('x').both('link').dedup()
+    .loop('x') {true} {true}.dedup() 
+    .count()
+
+// check if the total number of stages does not equal the the number connected to the first stage
+if (totalStageCount != stageConnectedCount) compliance.failure("More than one data flow was found in this job. Consider separating them into different jobs.")

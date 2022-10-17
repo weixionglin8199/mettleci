@@ -1,0 +1,59 @@
+/*
+*
+* Stage Naming Standards for Job Sequences
+*
+* Verifies that job activities names match the Data Migrators naming standards.
+* All naming standards are documented on the Data Migrators wiki: 
+* https://datamigrators.atlassian.net/wiki/display/MCI/DataStage+Naming+Standards
+*
+* Rationale:
+* Our naming standards are designed to reduce the amount of effort required for developers to
+* understand what a sequence is doing without needing to inspect each activity on the job canvas and to quickly
+* identify job activities from text based messages such as director errors and compliance rule failures.
+*
+* In most cases, this is achieved by having a prefix that reflects the acticity type.  However, some 
+* activities provide additional information which cannot be determined
+* without inspecting the activity in question.
+*
+* Enforced naming standards of this nature also allows future IP to easily determine activity types based
+* on the name without needing to refer to IGC or XMETA.  Additionally, these naming standards help prevent
+* trivial feedback from external vendors during data migration/warehouse "audits".
+*/
+
+def map = [
+// Sequences  -----------------------------------------------------------------
+'CCondition'                      : '^con[A-Z0-9][A-Za-z0-9|_]*' , // Condition
+'CEndLoopActivity'                : '^le[A-Z0-9][A-Za-z0-9|_]*'  , // End Loop Activity
+'CExceptionHandler'               : '^exc[A-Z0-9][A-Za-z0-9|_]*' , // Exception Handler
+'CExecCommandActivity'            : '^com[A-Z0-9][A-Za-z0-9|_]*' , // Execute Command Activity
+'CJobActivity'                    : '^job[A-Z0-9][A-Za-z0-9|_]*' , // Job Activity
+'CNotificationActivity'           : '^not[A-Z0-9][A-Za-z0-9|_]*' , // Notification Activity
+'COozieWfActivity'                : '^ooz[A-Z0-9][A-Za-z0-9|_]*' , // Oozie Workflow
+'CRoutineActivity'                : '^rt[A-Z0-9][A-Za-z0-9|_]*'  , // Routine Activity
+'CSequencer'                      : '^seq[A-Z0-9][A-Za-z0-9|_]*' , // Job Sequence
+'CStartLoopActivity'              : '^ls[A-Z0-9][A-Za-z0-9|_]*'  , // Start Loop Activity
+'CTerminatorActivity'             : '^ter[A-Z0-9][A-Za-z0-9|_]*' , // Terminator Activity
+'CUserVarsActivity'               : '^usr[A-Z0-9][A-Za-z0-9|_]*' , // User Variables Activity
+'CWaitForFileActivity'            : '^wff[A-Z0-9][A-Za-z0-9|_]*'   // Wait For File Activity
+]
+
+item.graph.V.comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' (${it.stageType}) has an incorrectly formatted name.  Its name should match the regular expression '${it.pattern}'."} { 
+
+	if (it.stageType != null) {
+		
+		def regex = null;
+
+		if (map.containsKey(it.stageType)) {
+			regex = map[it.stageType];
+		} 
+		
+		if (regex != null) {
+			it.pattern = regex;
+			return it.stageName.matches(regex);
+		}
+		
+	}
+	return true;
+
+};
+

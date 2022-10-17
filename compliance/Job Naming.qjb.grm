@@ -1,0 +1,29 @@
+/*
+ * Checks the job name against a black list of known bad names (eg. CopyOf*).
+ *
+ * Rationale:
+ * As developers we will occasionally work on a copy or wip job but forget to rename it before checkin.
+ * This simple compliance test is designed to make these mistakes visible at check-in time.
+ */
+
+def blacklist = [
+  '^(?i)CopyOf.*',		//Job Name starts with CopyOf
+  '^(?i)Untitled.*',	//Job Name starts with 'Untitled'    
+  '(?i).*_WIP$',		//Job Name ends with WIP
+  '(?i).*DEBUG$',		//Job Name ends with DEBUG
+  '(?i).*ORIGINAL$',	//Job Name ends with ORIGINAL
+  '(?i).*TEMP$',		//Job Name ends with TEMP
+  '(?i).*TMP$',			//Job Name ends with TMP
+  // Dates
+  '.*[12]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]).*', //YYYYMMDD
+  '.*(0[1-9]|[12]\\d|3[01])(0[1-9]|1[0-2])[12]\\d{3}.*', //DDMMYYYY
+  '.*(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])[12]\\d{3}.*', //MMDDYYYY
+  '.*\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]).*',     //YYMMDD
+  '.*(0[1-9]|[12]\\d|3[01])(0[1-9]|1[0-2])\\d{2}.*',     //DDMMYY
+  '.*(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])\\d{2}.*'      //MMDDYY
+]
+
+if (blacklist.any { item.name.matches(it) }) {
+    def msg = "Asset name suggests this is not intended for Production use. Consider removing or renaming it.";
+    compliance.failure(msg)
+}

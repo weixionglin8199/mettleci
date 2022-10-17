@@ -1,0 +1,29 @@
+/*
+ * Sequence Job with Hardcoded Parameter Values
+ *
+ * Rationale:
+ * In Sequence jobs, Job Activity stages calling jobs with parameters should have those parameters 
+ * populated from the sequence job, to ensure the sequences and individual jobs operate conistently.
+ *
+ * These hardcoded values may be explicit values entered into the Job Activity stage, or the Default Values gathered from the underlying job.
+ *
+ */
+
+def jobParameters = item.parameters;
+
+item.graph.V.stage.has('stageType', 'CJobActivity').sideEffect{ stage ->
+    stage.propertyKeys.each { propName ->
+        if (propName.matches("^Supplied:.*")) {
+            def paramName = propName.substring(propName.indexOf(":") + 1); 
+            def paramVal = stage[propName].toString();
+
+            // The members of a parameterset are not included in the parameter definition in the job ISX, only the parameterset itself. 
+            // So when a parameterset member is referenced in a job activity, the best we can do is to make sure the parameterset is at least included at the job level. 
+            paramVal = paramVal?(paramVal.indexOf('.') > 0?paramVal.substring(0,paramVal.indexOf('.')):paramVal):null;
+            
+            if (!jobParameters.containsKey(paramVal)) {
+                compliance.failure("Stage ${stage.stageName}: Job Activity parameter ${paramName} contains a hard-coded or default value '${stage[propName]}'")
+            }
+        }
+    }
+}.iterate();

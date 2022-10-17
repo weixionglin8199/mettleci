@@ -1,0 +1,8 @@
+/*
+* Lists the stages that are not yet supported by IBM Cloud Private for Data
+*
+* Server jobs are not supported in ICPD, so this provides a single error message to that point. 
+*
+*/
+
+compliance.failure("Server jobs are not supported by IBM Cloud Pak for Data.");

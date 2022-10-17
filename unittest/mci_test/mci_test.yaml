@@ -1,0 +1,15 @@
+---
+given:
+- stage: "Sequential_File_0"
+  link: "DSLink2"
+  path: "Sequential_File_0-DSLink2.csv"
+when:
+  job: "mci_test"
+  controller: null
+  parameters: {}
+then:
+- stage: "Sequential_File_1"
+  link: "DSLink2"
+  path: "Sequential_File_1-DSLink2.csv"
+  cluster: null
+  ignore: null

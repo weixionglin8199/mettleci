@@ -1,0 +1,21 @@
+/*
+ * Searches job designs looking for adjacent transformer stages 
+ *
+ * Rationale:
+ * Although powerful, transformers contain embedded logic that is not immediately obvious when looking at the canvas and
+ * reduces a developers ability to immediately understand a job's logic.  Over use of transformers when move "verbose" 
+ * stages could achieve the same outcome can result in greater maintenance overhead.
+ *
+ * Adjacent transformers can be a symptom of a transformer that has become so complex that a developer has needed to split
+ * the embedded logic across two transformers. When this occurs, developers should consider if there is an alternative 
+ * implementation strategy that could be implemented using multiple standard stages working in conjunction rather than 
+ * performing all logic within one or more transformer stages
+ *
+ * Alternatively, adjacent transformers can also be a symptom of defect fixes that are "tacked on" to an existing job
+ * rather than understanding the existing job logic and refactoring accordingly.  Making job changes without continually
+ * refactoring the existing code will degrade job quality and increase maintenance over time.
+ */
+item.graph.V
+   .stage.has('stageType', 'CTransformerStage').out
+   .stage.has('stageType', 'CTransformerStage').dedup()
+   .comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' is adjacent to another ${config.readableStageTypes[it.stageType] ?: it.stageType}. Consider consolidating these stages into a single stage, or separate them with an intermediate stage."}

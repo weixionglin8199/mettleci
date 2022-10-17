@@ -1,0 +1,199 @@
+/*
+*
+* Default Stage Names for Parallel Jobs
+*
+* Rationale:
+* Stages should be given meanigful names, to improve readability and reduce bug-fixing effort.
+* Suggests they might possibly be "not quite finished".
+*
+*/
+
+def map = [
+// Data Quality ---------------------------------------------------------------
+'IADataRule'                     : 'Data_Rules_'  , 		// Data Rules
+'ExceptionStage'                 : 'Exceptions_' , 			// Exceptions
+'Investigate'                    : 'Investigate_' , 		// Investigate
+'MatchFrequency'                 : 'Match_Frequency_' , 	// Match Frequency
+'MasterDataManagementConnectorPX': 'MDM_Connector_' , 		// MDM Connector
+'MNS'                            : 'MNS_' , 				// Multi-National Standardization (MNS)
+'UnduplicateMatch'               : 'One_source_Match_' , 	// One Source Match
+'SQA'                            : 'SQA_' , 				// Standardization Quality Assessment (SQA)
+'Standardize'                    : 'Standardize_' , 		// Standardize
+'Survive'                        : 'Survive_' , 			// Survive
+'ReferenceMatch'                 : 'Two_source_Match_' ,	// Two Source Match
+// Database -------------------------------------------------------------------
+'CassandraConnectorPX'           : 'Cassandra_Connector_' , 			// Cassandra Federation
+//'MetaCassandraConnectorPX'       : 'cas[A-Z0-9][A-Za-z0-9|_]*' , 		// Cassandra Federation
+'PXClassicFederation'            : 'Classic_Federation_' , 				// Classic Federation
+'CognosTM1ConnectorPX'           : 'Cognos_TM1_Connector_' , 			// Cognos TM1 Connector
+'DB2ConnectorPX'                 : 'DB2_Connector_' , 					// DB2 Connector
+'DSDB2PX'                        : 'DB2_UDB_API_Stage_' , 				// DB2 UDB API Stage has been DEPRECATED
+'UDBLoadPX'                      : 'DB2_UDB_Load_' , 					// DB2 UDB Load has been DEPRECATED
+'PxDB2'                          : 'DB2_UDB_Enterprise_' , 				// DB2/UDB Enterprise
+'PxDB2Z'                         : 'DB2Z_' , 							// DB2Z has been DEPRECATED
+'DTStagePX'                      : 'Distributed_Transaction_' , 		// Distributed Transaction
+'DRSConnectorPX'                 : 'DRS_Connector_' , 					// DRS Connector
+'DRSPX'                          : 'Dynamic_RDBMS_' , 					// Dynamic RDBMS has been DEPRECATED
+'GreenplumConnectorPX'           : 'Greenplum_Connector_'  , 			// GreenPlum Connector
+'HiveConnectorPX'                : 'Hive_Connector_', 					// Hive Connector *NEW*
+'HiveMetastorePX'                : 'Hive_Metastore_Import_Connector_', 	// Hive Metastore Import Connector *NEW*
+'InfmxCLIPX'                     : 'Informix_CLI_' , 					// Informix CLI
+'PxInformixXPS'                  : 'Informix_Enterprise_' , 			// Informix Enterprise
+'INFBLK10PX'                     : 'Informix_Load_' , 					// Informix Load
+'XPSLoadPX'                      : 'Informix_XPS_Load_' , 				// Informix XPS Load
+'Pxiway'                         : 'iWay_Enterprise_', 					// iWay Enterprise
+'JDBCConnectorPX'                : 'JDBC_Connector_', 					// JDBC Connector
+'NetezzaConnectorPX'             : 'Netezza_Connector_' , 				// Netezza Connector
+'PxNetezza'                      : 'Netezza_Enterprise_' , 				// Netezza Enterprise
+'ODBCConnectorPX'                : 'ODBC_Connector_', 					// ODBC Connector
+'PxOdbc'                         : 'ODBC_Enterprise_', 					// ODBC Enterprise
+'OracleConnectorPX'              : 'Oracle_Connector_' , 				// Oracle Connector
+'PxOracle'                       : 'Oracle_Enterprise_' , 				// Oracle Enterprise
+'ORAOCIBLPX'                     : 'Oracle_OCI_Load_' , 				// Oracle OCI Load has been DEPRECATED
+'rdbloadPX'                      : 'RedBrick_Load_'  , 					// RedBrick Load
+'SnowflakeConnectorPX'           : 'Snowflake_Connector_'  , 			// Snowflake Connector
+'Pxsqlsvr'                       : 'SQLServer_Enterprise_' , 			// SQLServer Enterprise - Deprecated
+'STPPX'                          : 'Stored_Procedure_' , 				// Stored Procedure
+'PxSybase'                       : 'Sybase_Enterprise_' , 				// Sybase Enterprise
+'IQBulk12PX'                     : 'Sybase_IQ_12_Load_' , 				// Sybase IQ 12 Load
+'SYBASEOCPX'                     : 'Sybase_OC_' , 						// Sybase OC
+'TeradataPX'                     : 'Teradata_API_', 					// Teradata API has been DEPRECATED
+'TeradataConnectorPX'            : 'Teradata_Connector_', 				// Teradata Connector
+'PxTeradata'                     : 'Teradata_Enterprise_', 				// Teradata Enterprise
+'TerabulkPX'                     : 'Teradata_Load_', 					// Teradata Load has been DEPRECATED
+'TDMLoadPX'                      : 'Teradata_Multiload_', 				// Teradata Multiload
+// Debug ----------------------------------------------------------------------
+'PxColumnGenerator'              : 'Column_Generator_'  , 	// Column Generator
+'PxHead'                         : 'Head_'  , 				// Head
+'PxPeek'                         : 'Peek_'  , 				// Peek
+'PxRowGenerator'                 : 'Row_Generator_'  , 		// Row Generator
+'PxSample'                       : 'Sample_'  , 			// Sample
+'PxTail'                         : 'Tail_'  , 				// Tail
+'PxWriteRangeMap'                : 'Write_Range_Map_' , 	// Write Range Map
+// File -----------------------------------------------------------------------
+'AzureBlobStorageConnectorPX'    : 'Azure_Storage_Connector_3'  , 		// Azure Blob Storage Connector 
+'AzureFileStorageConnectorPX'    : 'Azure_Storage_Connector___Blob_'  , // Azure File Storage Connector
+'AzureStorageConnectorPX'        : 'Azure_Storage_Connector___File_'  , // Azure Storage Connector
+'AmazonS3PX'                     : 'Amazon_S3_'  , 						// Amazon S3
+'PxBDFS'                         : 'Big_Data_File_'  , 					// Big Data File *NEW*
+'cloudobjectstoragePX'           : 'CloudObjectStorage_Connector_' , 	// Cloud Object Storage  ?
+'PxCFF'                          : 'Complex_Flat_File_' , 				// Complex Flat File
+'PxDataSet'                      : 'Data_Set_'  , 						// Data Set
+'PxExternalSource'               : 'External_Source_' , 				// External Source
+'PxExternalTarget'               : 'External_Target_' , 				// External Target
+'FileConnectorPX'                : 'File_Connector_', 					// File Connector
+'LocalFileConnectorPX'           : 'File_Connector___Engine_tier_', 	// File Connector - Engine Tier
+'HDFSConnectorPX'                : 'HDFS_Connector_' , 					// HDFS file system importer *NEW*
+'HDFSFileConnectorPX'            : 'File_Connector___HDFS_', 			// File Connector - HDFS
+'PxFileSet'                      : 'File_Set_'  , 						// FileSet
+'PxLookupFileSet'                : 'Lookup_File_Set_' , 				// Lookup FileSet
+'PxParSASDataSet'                : 'SAS_Parallel_Data_Set_', 			// SAS Parallel Data Set *NEW*
+'PxSequentialFile'               : 'Sequential_File_'  , 				// Sequential File
+'UnstructuredDataConnectorPX'    : 'Unstructured_Data_'  , 				// Unstructured Data
+'PxzOSFile'                      : 'zOSFile_' , 						// zOSFile
+// Packs ----------------------------------------------------------------------
+'EssbaseConnectorPX'             : 'Essbase_Connector_' , 					// Essbase Connector
+'PS_HRYPX'                       : 'Hierarchy_for_PeopleSoft_Enterprise_' , // Hierarchy for PeopleSoft Enterprise
+'PeoplesoftOnePX'                : 'JD_Edwards_EnterpriseOne_' , 			// JD Edwards EnterpriseOne
+'ORAAppsPX'                      : 'Oracle_Applications_Direct_Access_' , 	// Oracle Applications Direct Access
+'orahrchy_PX'                    : 'Oracle_Applications_Hierarchy_' , 		// Oracle Applications Hierarchy
+'SALESFORCEJCConnectorPX'        : 'Salesforce_'  , 						// Salesforce
+'Siebel_BCPX'                    : 'Siebel_BC_Pack_', 						// Siebel BC Pack
+'Siebel_DAPX'                    : 'Siebel_DA_Pack_', 						// Siebel DA Pack
+'Siebel_EIMPX'                   : 'Siebel_EIM_Pack_', 						// Siebel EIM Pack
+// Processing -----------------------------------------------------------------
+'CTransformerStage'              : 'Transformer_'  , 				// Transformer
+'PxSVTransformer'                : 'BASIC_Transformer_' , 			// BASIC Transformer
+'PxAggregator'                   : 'Aggregator_',	 				// Aggregator
+'PxBLM'                          : 'Bloomfilter_' , 				// Bloomfilter
+'PxChangeApply'                  : 'Change_Apply_'  , 				// Change Apply
+'PxChangeCapture'                : 'Change_Capture_'  ,  			// Change Capture
+'PxChecksum'                     : 'Checksum_'  ,  					// Checksum
+'PxCompare'                      : 'Compare_' ,  					// Compare
+'PxCompress'                     : 'Compress_' ,  					// Compress
+'PxCopy'                         : 'Copy_'  ,  						// Copy
+'DMConnectorPX'                  : 'Data_Masking_'  ,  				// Data Masking  
+'PxDecode'                       : 'Decode_'  ,  					// Decode
+'PxDifference'                   : 'Difference_'  ,  				// Difference
+'PxEncode'                       : 'Encode_'  ,  					// Encode
+'PxExpand'                       : 'Expand_' ,  					// Expand
+'PxExternalFilter'               : 'External_Filter_'  ,  			// External Filter
+'PxFilter'                       : 'Filter_'  ,  					// Filter
+'PxFTP'                          : 'FTP_Enterprise_' ,  			// FTP Enterprise
+'ftpPX'                          : 'FTP_Plug_in_' ,  				// FTP Plug-in
+'PxFunnel'                       : 'Funnel_'  ,  					// Funnel
+'PxGeneric'                      : 'Generic_'  ,  					// Generic
+'PxJoin'                         : 'Join_'  ,  						// Join
+'PxLookup'                       : 'Lookup_'  ,  					// Lookup
+'PxMerge'                        : 'Merge_'  ,  					// Merge
+'PxModify'                       : 'Modify_'  ,  					// Modify
+'PivotPX'                        : 'Pivot_'  ,  					// Pivot
+'PxPivot'                        : 'Pivot_Enterprise_'  ,  			// Pivot Enterprise
+'PxRemDup'                       : 'Remove_Duplicates_'  ,  		// Remove Duplicates
+'PxSAS'                          : 'SAS_',  						// SAS *NEW*
+'PxSCD'                          : 'Slowly_Changing_Dimension_' , 	// Slowly Changing Dimension
+'PxSort'                         : 'Sort_'  , 						// Sort
+'PxSurrogateKeyGenerator'        : 'Surrogate_Key_Generator_'  , 	// Surrogate Key Generator (1)
+'PxSurrogateKeyGeneratorN'       : 'Surrogate_Key_Generator_'  , 	// Surrogate Key Generator (2)
+'PxSwitch'                       : 'Switch_'  , 					// Switch
+'PxWaveGenerator'                : 'Wave_Generator_'  , 			// Wave Generator
+// Real Time ------------------------------------------------------------------
+'CDCTStagePX'                    : 'CDC_Transaction_' ,  			// CDC Transaction
+'XMLStagePX'                     : 'Hierarchical_Data_' ,			// Hierarchical Data
+'ILOGJRulesConnectorPX'          : 'ILOG_JRules_Connector_'  , 		// ILOG JRules Connector
+'PxRTIInput'                     : 'ISD_Input_' ,  					// ISD Input
+'PxRTIOutput'                    : 'ISD_Output_' ,  				// ISD Output
+'JClientPX'                      : 'Java_Client_'  ,  				// Java Client
+'JavaStagePX'                    : 'Java_Integration_',  			// Java Integration
+'JTransformerPX'                 : 'Java_Transformer_'  ,  			// Java Transformer
+'KafkaConnectorPX'               : 'Kafka_Connector_',  			// Kafka Connector *NEW*
+'JAQLConnectorPX'                : 'MapReduce_Connector_'  , 		// MapReduce Connector
+'StreamsConnectorPX'             : 'Streams_Connector_' , 			// Streams Connector
+'WSClientPX'                     : 'Web_Services_Client_' , 		// Web Services Client
+'WSTransformerPX'                : 'Web_Services_Transformer_' , 	// Web Services Transformer
+'MQSeriesPX'                     : 'WebSphere_MQ_Stage_'  , 		// WebSphere MQ Stage has been DEPRECATED - not on the palette: this is a bit of a guess
+'WebSphereMQConnectorPX'         : 'WebSphere_MQ_Connector_'  ,		// WebSphere MQ Connector
+'XMLInputPX'                     : 'XML_Input_' , 					// XML Input
+'XMLOutputPX'                    : 'XML_Output_' , 					// XML Output	
+'XMLTransformerPX'               : 'XML_Transformer_' , 			// XML Transformer
+// Restructure ----------------------------------------------------------------
+'PxColumnExport'                 : 'Column_Export_'  , 		// ColumnExport
+'PxColumnImport'                 : 'Column_Import_'  , 		// ColumnImport
+'PxCombineRecords'               : 'Combine_Records_'  , 	// CombineRecords
+'PxMakeSubRec'                   : 'Make_Subrecord_' , 		// MakeSub-Record
+'PxMakeVect'                     : 'Make_Vector_' , 		// MakeVector
+'PxPromoteSubRec'                : 'Promote_Subrecord_' , 	// PromoteSub-Record
+'PxSplitSubRec'                  : 'Split_Subrecord_' , 	// SplitSub-Record
+'PxSplitVect'                    : 'Split_Vector_'  		// SplitVector
+]
+
+//Stages
+item.graph.V.stage.comply{"${it.msg}"} { 
+
+	if (it.stageType != null) {
+		
+		def regex = null;
+		def msg = null;
+
+		if (map.containsKey(it.stageType)) {
+			regex = "^(Copy_([0-9]+_)?of_)?" + map[it.stageType] + "(has_been_DEPRECATED_)?[0-9]+";
+			msg = "${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' uses DataStage's default naming. Please provide a meaningful name meeting naming standards.";
+		} else if (it.stageType == "container") {
+			regex = "^" + it.containerName + "C[0-9]+";
+			msg = "Container ${it.stageName} uses DataStage's default naming. Please provide a meaningful name meeting naming standards.";
+		}
+		
+		if (regex != null) {
+			it.msg = msg;
+			return !it.stageName.matches(regex);
+		}
+		
+	}
+	return true;
+
+}.iterate();
+
+//Links
+item.graph.E.link.comply{"Link ${it.linkName} uses DataStage's default naming. Please provide a meaningful name meeting naming standards."} { 
+	return !it.linkName.matches("^DSLink[1-9][0-9]*");
+};

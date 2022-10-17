@@ -1,0 +1,14 @@
+/*
+ * Checks that a job has one and only one auditable output link.  These are identified using the
+ * "out%" link naming standard
+ *
+ * Rationale:
+ * Our audit reports show the lineage of how row counts change from source to target.  For this to work
+ * effectively, the system assumes that each job will only produce a single output and all inputs, drops
+ * and deltas has a direct input on the output row count.
+ *
+ * A job with anything other than a single "out%" link will not produce a sensible audit trail.
+ */
+
+if (item.graph.E.link.filter{ it.linkName ==~ /out([A-Z].*)?$/ }.count() != 1)
+  compliance.failure("Job must have one and only one audit output")

@@ -1,0 +1,29 @@
+/*
+ * Identifies unique sorts
+ *
+ * Rationale:
+ * Unique sorts are not visually represented on the DataStage canvas. Ideally the developer should use the remove
+ * duplicates stage so that this can be visually communicated with other developers.
+ *
+ * This rule will identify sort stages which have the "Allow Duplicates" property set to "false".
+ */
+
+ def uniqueSort = { stage ->
+ 
+    // filter anything that isn't a sort
+    if (stage.stageType != 'PxSort') {
+        return false
+    }
+    
+    // filter key unique sort
+    if (' '.equalsIgnoreCase(stage.unique)) {
+        return false
+    }
+    
+    // we have a unique sort!
+    return true
+}
+
+item.graph.V.stage.filter(uniqueSort)
+    .comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' is configured to prohibit duplicates. Consider replacing with an explicit Remove Duplicates stage to improve your job's maintainability."}
+    

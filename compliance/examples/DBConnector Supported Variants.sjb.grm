@@ -1,0 +1,53 @@
+/*
+* Ensures that all Database Connectors and Stages must use valid variants
+*
+* Rationale:
+* This is a RDU scenario, whereby the connector variant originally specified is no longer supported by DataStage.
+*
+* NOTE: This is not directly a problem, but .
+*/
+
+
+// stage to file property mapping
+
+def supportedStageVariants = [
+    'DB2Connector'                : "V1;9.1::ccdb2",
+    'DRSConnector'                : "V1;1.0::ccdrs",
+    'NetezzaConnector'            : "V1;4.5::ccnz",
+    'ODBCConnector'               : "V1;3.5::ccodbc",
+    'OracleConnector'             : "V1;11:&quot;11g&quot;:ccora11g;12:&quot;12c&quot;:ccora12c",
+    'TeradataConnector'           : "V1;12::cctera12",
+]
+
+
+item.graph.V.stage.sideEffect{ stage ->
+    // the properties for this stage type
+    def supportedVariants = supportedStageVariants[stage.stageType]
+	    
+	if (supportedVariants) {
+        def selectedVariant = stage["VariantName"]
+        if (selectedVariant) {
+            if (!supportedVariants.find(";" + selectedVariant + "[&:]")) {
+                compliance.failure("${config.readableStageTypes[stage.stageType] ?: stage.stageType} '${stage.stageName}' uses a selected variant '${selectedVariant}' which is no longer supported by the ${config.readableStageTypes[stage.stageType] ?: stage.stageType} stage.")
+            }
+        }
+    }
+}.iterate();
+
+item.graph.V.stage.has('stageType', 'DRSConnector').sideEffect{ stage ->
+    def selectedDB = Eval.x(stage["XMLProperties"], "x.Connection.RDBMS").toString()
+
+    if (selectedDB == "Oracle") {
+        def selectedVariant = Eval.x(stage["XMLProperties"], "x.Connection.VARIANT.OracleVariant");
+        if ("|11|12|".contains("|" + selectedVariant + "|") == false) {
+            compliance.failure("${stage.stageName}: selected variant '${selectedVariant}' is no longer supported by the DRS Connector in Oracle mode")
+        }
+    }
+
+    if (selectedDB == "IBM DB2") {
+        def selectedVariant = Eval.x(stage["XMLProperties"], "x.Connection.VARIANT.IBM_DB2Variant");
+        if ("|9.8|10.1|10.5|11.1|".contains("|" + selectedVariant + "|") == false) {
+            compliance.failure("${stage.stageName}: selected variant '${selectedVariant}' is no longer supported by the DRS Connector in DB2 mode")
+        }
+    }
+}

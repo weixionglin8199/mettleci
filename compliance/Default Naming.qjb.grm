@@ -1,0 +1,52 @@
+/*
+*
+* Default Stage Names for Job Sequences
+*
+* Rationale:
+* Activities should be given meanigful names, to improve readability and reduce bug-fixing effort.
+* The use of DataStage's default naming suggests these activities might be "not quite finished".
+* Note that we don't need to suggest the recommended naming here as that's provided by the
+* Naming Standards rule(s).
+*
+*/
+
+def map = [
+// Sequences  -----------------------------------------------------------------
+'CCondition'                      : 'Nested_Condition_' , // Condition
+'CEndLoopActivity'                : 'EndLoop_Activity_'  , // End Loop Activity
+'CExceptionHandler'               : 'Exception_Handler_' , // Exception Handler
+'CExecCommandActivity'            : 'Execute_Command_' , // Execute Command Activity
+'CJobActivity'                    : 'Job_Activity_' , // Job Activity
+'CNotificationActivity'           : 'Notification_Activity_' , // Notification Activity
+'COozieWfActivity'                : 'Oozie_Workflow_Activity_' , // Oozie Workflow
+'CRoutineActivity'                : 'Routine_Activity_'  , // Routine Activity
+'CSequencer'                      : 'Sequencer_' , // Job Sequence
+'CStartLoopActivity'              : 'StartLoop_Activity_'  , // Start Loop Activity
+'CTerminatorActivity'             : 'Terminator_Activity_' , // Terminator Activity
+'CUserVarsActivity'               : 'UserVariables_Activity_' , // User Variables Activity
+'CWaitForFileActivity'            : 'Wait_For_File_Activity_'   // Wait For File Activity
+]
+
+//Stages
+item.graph.V.stage.comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' uses DataStage's default naming. Please provide a meaningful name meeting naming standards."} { 
+
+	if (it.stageType != null) {		
+		def regex = null;
+
+		if (map.containsKey(it.stageType)) {
+			regex = map[it.stageType];
+		} 
+		
+		if (regex != null) {
+			return !it.stageName.matches("^(Copy_([0-9]+_)?of_)?" + regex + "[0-9]+");
+		}
+	}
+	return true;
+
+}.iterate();
+
+//Links
+item.graph.E.link.comply{"Link ${it.linkName} uses DataStage's default naming. Please provide a meaningful name meeting naming standards."} { 
+	return !it.linkName.matches("^DSLink[1-9][0-9]*");
+};
+

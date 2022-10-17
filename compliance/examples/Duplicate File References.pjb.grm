@@ -1,0 +1,88 @@
+/*
+ * Verifies that a file is only referenced once in a DataStage job (Sequential File, Complex Flat
+ * File and DataSet)
+ *
+ * Rationale: 
+ * Sometimes developers will copy and paste stages rather than adding a new stage from the palette. 
+ * In doing so there is a risk that the developer may not update the reference to the filename 
+ * property which which may result in incorrect processing being performed by the ETL job.
+ * 
+ */
+
+// stage to file property mapping
+def stageProperties = [
+    'PxSequentialFile'              : 'dummy',  // value not used, but required for awareness of what stages are affected by this rule, and to get pass the condition if(!propertyName)
+    'PxCFF'                         : 'filename',
+    'PxDataSet'                     : 'dataset'
+]
+
+def filenames = []
+
+def getSequentialFilePaths(stage) {
+    // Map value in 'selection' property to property to check for filepath
+    def selectionMap = [
+        'file'    : 'file +',
+        'pattern' : 'filepattern'
+    ]
+
+    // Check if stage has an output or input link (i.e. is it a source or target)...
+    if (stage?.out?.pin) {
+        // This dertermines which property to check for file path
+        def selection = stage?.out?.pin?.selection.next()
+
+        // Get file path based on selection
+        def fileProp = selectionMap[selection.toString()]
+
+        return stage?.out?.pin?.property(fileProp).next().toString()
+    } else {
+        // This dertermines which property to check for file path
+        def writemethod = stage?.in?.pin?.writemethod.next()
+
+        // Get file path based on writemethod
+        if (writemethod.toString() == " ") {
+            return stage?.in?.pin?.property("file").next().toString()
+        }
+
+        if (writemethod.toString() == "filepattern") {
+            // If writemethod is 'filepattern', it may have a sub-property 'filepath'
+            def filepath = stage.in.pin.writemethod.next().filepath
+            if (filepath) return filepath.toString()
+
+            return null
+        }
+    }
+}
+
+
+// iterate through all stages in the graph
+item.graph.V.stage.filter { stage ->
+
+     // the properties for this stage type
+    def propertyName = stageProperties[stage.stageType]
+
+    // check if the stage is in the list of stage properties
+    if (!propertyName) {
+        return false
+    }
+
+    // check if the stage is a sequential file or dataset
+    if('PxDataSet'.equalsIgnoreCase(stage.stageType)) {
+        stage.out.pin.property(propertyName).fill(filenames)
+        stage.in.pin.property(propertyName).fill(filenames)
+    } else if ('PxSequentialFile'.equalsIgnoreCase(stage.stageType)) {
+        def path = getSequentialFilePaths(stage)
+        if (path) filenames.add(path)
+    } else {
+        stage.property(propertyName).fill(filenames)
+    }
+   
+    return true
+
+}.iterate()
+
+def duplicated = filenames.groupBy { it.toString() }.findAll { it.value.size() > 1} 
+
+for (file in duplicated.keySet())
+{
+	compliance.failure("File '${file}' referenced more than once")
+}

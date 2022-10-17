@@ -1,0 +1,79 @@
+/*
+* Ensures that all File Stages must use variables for determining paths
+*
+* Rationale:
+* Developers occasionally hard code file paths while debugging or developing.  
+* These will cause job failures when deploying to a different project or server.
+*
+* This problem is usually solved by using a project specific variable to define the base
+* path for file based stages such as datasets.  This compliance rule will identify hard 
+* coded file paths by checking that the pathname includes at least one predefined path parameter.
+*
+* The predefined path parameters and the stages for which they can be used with can be customized
+* by modifying the "pathParameters" variable.
+*/
+
+// stage to file property mapping
+def stageProperties = [
+    'CHashedFileStage'              :[ names: ['Directory'] ],
+    'Folder'                        :[ names: ['Directory'] ],
+    'CFF'                           :[ names: ['Path'] ],
+    'CSeqFileStage'                 :[ names: ['FileName'] ],
+    'XMLTransformer'                :[ names: ['output_file'] ]
+]
+item.graph.V.stage.comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' uses hardcoded path '${it.hardcodedPath}'. "} { stage ->
+
+    // the properties for this stage type
+    def property = stageProperties[stage.stageType]
+    
+    if (!property) return true
+        
+    // build all paths associated with this stage
+    def paths = []
+    
+    property.names.each { propertyName->
+        // get the paths from the stage
+        if (stage[propertyName] != null) {
+            paths.add(stage[propertyName])
+        }
+
+        // get paths from input/output pins
+        stage.in.pin.property(propertyName).fill(paths)
+        stage.out.pin.property(propertyName).fill(paths)
+    }
+    
+    // flatten any sub arrays
+    paths = paths.flatten()
+    
+    // turn path properties into strings considering any property hierarchy queries
+    paths = paths.findResults{ path->
+    
+        if (property.query) {
+            // evaluate the path using supplied query
+            path = Eval.x(path, "x.${property.query}").toString()
+
+            // filter blank strings which occur when query does not match the property hierarchy
+            path = path?:null
+
+        } else {
+            path = path?.toString()
+            
+        }
+        
+        return path?path.trim():null
+    }
+    
+    // ensure every path contains at least one known parameter
+    return paths.every { path ->
+        if (!path) true
+
+        if (path.matches(".*#.*#.*")) {
+            true
+        } else {
+            stage.hardcodedPath = path
+            false
+        }
+    }
+
+}
+

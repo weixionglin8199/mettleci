@@ -1,0 +1,19 @@
+
+mandatory:
+  - Hardcoded File Paths
+  - CCMigrateTool Stages
+  - Invalid Asset Model
+optional:
+  - Database Row Limit
+  - Lookup Failure
+  - Debug Row Limit
+  - Adjacent Transformers
+  - Default Naming
+  - Job Naming
+  - Link Sort
+  - Lookup Failure
+  - One Dataflow
+  - Range Lookup
+  - Too Many Stages
+  - Unique Sort
+

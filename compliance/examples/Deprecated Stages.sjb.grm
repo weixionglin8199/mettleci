@@ -1,0 +1,42 @@
+/*
+* This rule detects the use of DEPRECATED stages in Server Jobs
+* and suggests the recommended alternative
+*
+* Rationale:
+* From time to time, older Stage Types are updated/replaced. 
+* While the older Stage Types will continue to function, it is recommended to use the newer replacement Stage Types
+*
+* HOW TO USE
+* If you are running 11.7 or higher, don't comment out any rules
+* If you are running 11.5, comment out all the 11.7 rules
+* If you are running 11.3, comment out all the 11.5 and 11.7 rules
+* If you are running 9.1, comment out all the 11.5 and 11.7 rules
+* If you are running 8.7, comment out all the 9.1, 11.5 and 11.7 rules
+* If you are running 8.5, comment out all the 8.7, 9.1, 11.5 and 11.7 rules
+* If you are running below 8.5, comment out all the rules, but upgrade your environment soon. Seriously.
+*
+*/
+
+def map = [
+    'DRS'               : 'a DB2, Oracle, or ODBC Connector',   // From Version 8.5, Dynamic RDBMS has been DEPRECATED
+    'DSDB2'             : 'a DB2 Connector',                    // From Version 8.5, DB2 UDB API Stage has been DEPRECATED
+    'UDBLoad'           : 'a DB2 Connector',                    // From Version 8.5, DB2 UDB Load has been DEPRECATED
+    'ORAOCI9'           : 'an Oracle Connector',                // From Version 8.5, Oracle OCI Load has been DEPRECATED
+    'ORAOCIBL'          : 'an Oracle Connector',                // From Version 8.5, Oracle OCI Bulk Load has been DEPRECATED
+    'Terabulk'          : 'a Teradata Connector',               // From Version 8.5, Teradata Load has been DEPRECATED
+    'Teradata'          : 'a Teradata Connector',               // From Version 8.5, Teradata has been DEPRECATED
+    'TDMLoad'           : 'a Teradata Connector',               // From Version 8.5, Teradata MultiLoad has been DEPRECATED
+    'CODBCStage'        : 'an ODBC Connector'                   // From Version 8.7, ODBC Data Access has been DEPRECATED
+    ]
+
+item.graph.V.stage.comply{"Stage ${it.stageName} uses deprecated type ${it.stageType}. Consider replacing this stage with ${it.replacement} stage."} { 
+    
+    def replacement = map[it.stageType];
+    
+    if (replacement) {
+        it.replacement = replacement
+        return false
+    }
+    
+    return true
+};

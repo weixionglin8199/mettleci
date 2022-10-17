@@ -1,0 +1,248 @@
+/*
+*
+* Stage Naming Standards for Parallel Jobs
+*
+* Verifies that job stage names match the Data Migrators naming standards.
+* All naming standards are documented on the Data Migrators wiki: 
+* https://datamigrators.atlassian.net/wiki/display/MCI/DataStage+Naming+Standards
+*
+* Rationale:
+* Our naming standards are designed to reduce the amount of effort required for developers to
+* understand what a job is doing without needing to inspect each stage on the job canvas and to quickly
+* identify job stages from text based messages such as director errors and compliance rule failures.
+*
+* In most cases, this is achieved by having a prefix that reflects the stage type.  However, for stages
+* such as joins and funnels, the stage names provide additional information which cannot be determined
+* without inspecting the stage in question (ie. inner/left/right join).
+*
+* Enforced naming standards of this nature also allows future IP to easily determine stage types based
+* on the name without needing to refer to IGC or XMETA.  Additionally, these naming standards help prevent
+* trivial feedback from external vendors during data migration/warehouse "audits".
+*/
+
+def map = [
+// Data Quality ---------------------------------------------------------------
+'IADataRule'                     : '^dr[A-Z0-9][A-Za-z0-9|_]*'  , // Data Rules
+'ExceptionStage'                 : '^exc[A-Z0-9][A-Za-z0-9|_]*' , // Exceptions
+'Investigate'                    : '^inv[A-Z0-9][A-Za-z0-9|_]*' , // Investigate
+'MatchFrequency'                 : '^maf[A-Z0-9][A-Za-z0-9|_]*' , // Match Frequency
+'MasterDataManagementConnectorPX': '^mdm[A-Z0-9][A-Za-z0-9|_]*' , // MDM Connector
+'MNS'                            : '^mns[A-Z0-9][A-Za-z0-9|_]*' , // Multi-National Standardization (MNS)
+'UnduplicateMatch'               : '^udm[A-Z0-9][A-Za-z0-9|_]*' , // One Source Match
+'SQA'                            : '^sqa[A-Z0-9][A-Za-z0-9|_]*' , // Standardization Quality Assessment (SQA)
+'Standardize'                    : '^std[A-Z0-9][A-Za-z0-9|_]*' , // Standardize
+'Survive'                        : '^srv[A-Z0-9][A-Za-z0-9|_]*' , // Survive
+'ReferenceMatch'                 : '^rfm[A-Z0-9][A-Za-z0-9|_]*' , // Two Source Match
+// Database -------------------------------------------------------------------
+'CassandraConnectorPX'           : '^cas[A-Z0-9][A-Za-z0-9|_]*' , // Cassandra Federation
+'MetaCassandraConnectorPX'       : '^cas[A-Z0-9][A-Za-z0-9|_]*' , // Cassandra Federation
+'PXClassicFederation'            : '^clf[A-Z0-9][A-Za-z0-9|_]*' , // Classic Federation
+'CognosTM1ConnectorPX'           : '^tm1[A-Z0-9][A-Za-z0-9|_]*' , // Cognos TM1 Connector
+'DB2ConnectorPX'                 : '^db2[A-Z0-9][A-Za-z0-9|_]*' , // DB2 Connector
+'DSDB2PX'                        : '^db2[A-Z0-9][A-Za-z0-9|_]*' , // DB2 UDB API Stage has been DEPRECATED
+'UDBLoadPX'                      : '^db2[A-Z0-9][A-Za-z0-9|_]*' , // DB2 UDB Load has been DEPRECATED
+'PxDB2'                          : '^db2[A-Z0-9][A-Za-z0-9|_]*' , // DB2/UDB Enterprise
+'PxDB2Z'                         : '^db2[A-Z0-9][A-Za-z0-9|_]*' , // DB2Z has been DEPRECATED
+'DTStagePX'                      : '^dts[A-Z0-9][A-Za-z0-9|_]*' , // Distributed Transaction
+'DRSConnectorPX'                 : '^drs[A-Z0-9][A-Za-z0-9|_]*' , // DRS Connector
+'DRSPX'                          : '^drs[A-Z0-9][A-Za-z0-9|_]*' , // Dynamic RDBMS has been DEPRECATED
+'GreenplumConnectorPX'           : '^gp[A-Z0-9][A-Za-z0-9|_]*'  , // GreenPlum Connector
+'HiveConnectorPX'                : '^hive[A-Z0-9][A-Za-z0-9|_]*', // Hive Connector
+'InfmxCLIPX'                     : '^ifx[A-Z0-9][A-Za-z0-9|_]*' , // Informix CLI
+'PxInformixXPS'                  : '^ifx[A-Z0-9][A-Za-z0-9|_]*' , // Informix Enterprise
+'INFBLK10PX'                     : '^ifx[A-Z0-9][A-Za-z0-9|_]*' , // Informix Load
+'XPSLoadPX'                      : '^ifx[A-Z0-9][A-Za-z0-9|_]*' , // Informix XPS Load
+'Pxiway'                         : '^iway[A-Z0-9][A-Za-z0-9|_]*', // iWay Enterprise
+'JDBCConnectorPX'                : '^jdbc[A-Z0-9][A-Za-z0-9|_]*', // JDBC Connector
+'NetezzaConnectorPX'             : '^net[A-Z0-9][A-Za-z0-9|_]*' , // Netezza Connector
+'PxNetezza'                      : '^net[A-Z0-9][A-Za-z0-9|_]*' , // Netezza Enterprise
+'ODBCConnectorPX'                : '^odbc[A-Z0-9][A-Za-z0-9|_]*', // ODBC Connector
+'PxOdbc'                         : '^odbc[A-Z0-9][A-Za-z0-9|_]*', // ODBC Enterprise
+'OracleConnectorPX'              : '^ora[A-Z0-9][A-Za-z0-9|_]*' , // Oracle Connector
+'PxOracle'                       : '^ora[A-Z0-9][A-Za-z0-9|_]*' , // Oracle Enterprise
+'ORAOCIBLPX'                     : '^ora[A-Z0-9][A-Za-z0-9|_]*' , // Oracle OCI Load has been DEPRECATED
+'rdbloadPX'                      : '^rb[A-Z0-9][A-Za-z0-9|_]*'  , // RedBrick Load
+'SnowflakeConnectorPX'           : '^sn[A-Z0-9][A-Za-z0-9|_]*'  , // Snowflake Connector
+'Pxsqlsvr'                       : '^sql[A-Z0-9][A-Za-z0-9|_]*' , // SQLServer Enterprise
+'STPPX'                          : '^stp[A-Z0-9][A-Za-z0-9|_]*' , // Stored Procedure
+'PxSybase'                       : '^syb[A-Z0-9][A-Za-z0-9|_]*' , // Sybase Enterprise
+'IQBulk12PX'                     : '^syb[A-Z0-9][A-Za-z0-9|_]*' , // Sybase IQ 12 Load
+'SYBASEOCPX'                     : '^syb[A-Z0-9][A-Za-z0-9|_]*' , // Sybase OC
+'TeradataPX'                     : '^tera[A-Z0-9][A-Za-z0-9|_]*', // Teradata API has been DEPRECATED
+'TeradataConnectorPX'            : '^tera[A-Z0-9][A-Za-z0-9|_]*', // Teradata Connector
+'PxTeradata'                     : '^tera[A-Z0-9][A-Za-z0-9|_]*', // Teradata Enterprise
+'TerabulkPX'                     : '^tera[A-Z0-9][A-Za-z0-9|_]*', // Teradata Load has been DEPRECATED
+'TDMLoadPX'                      : '^tera[A-Z0-9][A-Za-z0-9|_]*', // Teradata Multiload
+// Debug ----------------------------------------------------------------------
+'PxColumnGenerator'              : '^cg[A-Z0-9][A-Za-z0-9|_]*'  , // Column Generator
+'PxHead'                         : '^hd[A-Z0-9][A-Za-z0-9|_]*'  , // Head
+'PxPeek'                         : '^pk[A-Z0-9][A-Za-z0-9|_]*'  , // Peek
+'PxRowGenerator'                 : '^rg[A-Z0-9][A-Za-z0-9|_]*'  , // Row Generator
+'PxSample'                       : '^sp[A-Z0-9][A-Za-z0-9|_]*'  , // Sample
+'PxTail'                         : '^tl[A-Z0-9][A-Za-z0-9|_]*'  , // Tail
+'PxWriteRangeMap'                : '^wrm[A-Z0-9][A-Za-z0-9|_]*' , // Write Range Map
+// File -----------------------------------------------------------------------
+'AzureBlobStorageConnectorPX'    : '^az[A-Z0-9][A-Za-z0-9|_]*'  , // Azure Blob Storage Connector
+'AzureFileStorageConnectorPX'    : '^az[A-Z0-9][A-Za-z0-9|_]*'  , // Azure File Storage Connector
+'AzureStorageConnectorPX'        : '^az[A-Z0-9][A-Za-z0-9|_]*'  , // Azure Storage Connector
+'AmazonS3PX'                     : '^s3[A-Z0-9][A-Za-z0-9|_]*'  , // Amazon S3
+'cloudobjectstoragePX'           : '^cos[A-Z0-9][A-Za-z0-9|_]*' , // Cloud Object Storage
+'PxCFF'                          : '^cff[A-Z0-9][A-Za-z0-9|_]*' , // Complex Flat File
+'PxDataSet'                      : '^ds[A-Z0-9][A-Za-z0-9|_]*'  , // Data Set
+'PxExternalSource'               : '^exs[A-Z0-9][A-Za-z0-9|_]*' , // External Source
+'PxExternalTarget'               : '^ext[A-Z0-9][A-Za-z0-9|_]*' , // External Target
+'FileConnectorPX'                : '^fcon[A-Z0-9][A-Za-z0-9|_]*', // File Connector
+'LocalFileConnectorPX'           : '^fcoe[A-Z0-9][A-Za-z0-9|_]*', // File Connector - Engine Tier
+'HDFSFileConnectorPX'            : '^fcoh[A-Z0-9][A-Za-z0-9|_]*', // File Connector - HDFS
+'PxFileSet'                      : '^fs[A-Z0-9][A-Za-z0-9|_]*'  , // FileSet
+'PxLookupFileSet'                : '^luf[A-Z0-9][A-Za-z0-9|_]*' , // Lookup FileSet
+'PxSequentialFile'               : '^sq[A-Z0-9][A-Za-z0-9|_]*'  , // Sequential File
+'UnstructuredDataConnectorPX'    : '^ud[A-Z0-9][A-Za-z0-9|_]*'  , // Unstructured Data
+'PxzOSFile'                      : '^zos[A-Z0-9][A-Za-z0-9|_]*' , // zOSFile
+// Packs ----------------------------------------------------------------------
+'EssbaseConnectorPX'             : '^ess[A-Z0-9][A-Za-z0-9|_]*' , // Essbase Connector
+'PS_HRYPX'                       : '^hpe[A-Z0-9][A-Za-z0-9|_]*' , // Hierarchy for PeopleSoft Enterprise
+'PeoplesoftOnePX'                : '^jde[A-Z0-9][A-Za-z0-9|_]*' , // JD Edwards EnterpriseOne
+'ORAAppsPX'                      : '^oad[A-Z0-9][A-Za-z0-9|_]*' , // Oracle Applications Direct Access
+'orahrchy_PX'                    : '^oah[A-Z0-9][A-Za-z0-9|_]*' , // Oracle Applications Hierarchy
+'SALESFORCEJCConnectorPX'        : '^sf[A-Z0-9][A-Za-z0-9|_]*'  , // Salesforce
+'Siebel_BCPX'                    : '^sbbc[A-Z0-9][A-Za-z0-9|_]*', // Siebel BC Pack
+'Siebel_DAPX'                    : '^sbda[A-Z0-9][A-Za-z0-9|_]*', // Siebel DA Pack
+'Siebel_EIMPX'                   : '^sieb[A-Z0-9][A-Za-z0-9|_]*', // Siebel EIM Pack
+// Processing -----------------------------------------------------------------
+'CTransformerStage'              : '^tx[A-Z0-9][A-Za-z0-9|_]*'  , // Transformer
+'PxSVTransformer'                : '^txb[A-Z0-9][A-Za-z0-9|_]*' , // BASIC Transformer
+'PxAggregator'                   : '^ag[A-Z0-9][A-Za-z0-9|_]*'  , // Aggregator
+'PxBLM'                          : '^blm[A-Z0-9][A-Za-z0-9|_]*' , // Bloomfilter
+'PxChangeApply'                  : '^ca[A-Z0-9][A-Za-z0-9|_]*'  , // Change Apply
+'PxChangeCapture'                : '^cc[A-Z0-9][A-Za-z0-9|_]*'  , // Change Capture
+'PxChecksum'                     : '^cs[A-Z0-9][A-Za-z0-9|_]*'  , // Checksum
+'PxCompare'                      : '^cmp[A-Z0-9][A-Za-z0-9|_]*' , // Compare
+'PxCompress'                     : '^zip[A-Z0-9][A-Za-z0-9|_]*' , // Compress
+'PxCopy'                         : '^cp[A-Z0-9][A-Za-z0-9|_]*'  , // Copy
+'DMConnectorPX'                  : '^dm[A-Z0-9][A-Za-z0-9|_]*'  , // Data Masking  
+'PxDecode'                       : '^dc[A-Z0-9][A-Za-z0-9|_]*'  , // Decode
+'PxDifference'                   : '^df[A-Z0-9][A-Za-z0-9|_]*'  , // Difference
+'PxEncode'                       : '^ec[A-Z0-9][A-Za-z0-9|_]*'  , // Encode
+'PxExpand'                       : '^uzp[A-Z0-9][A-Za-z0-9|_]*' , // Expand
+'PxExternalFilter'               : '^ef[A-Z0-9][A-Za-z0-9|_]*'  , // External Filter
+'PxFilter'                       : '^ft[A-Z0-9][A-Za-z0-9|_]*'  , // Filter
+'PxFTP'                          : '^ftp[A-Z0-9][A-Za-z0-9|_]*' , // FTP Enterprise
+'ftpPX'                          : '^ftp[A-Z0-9][A-Za-z0-9|_]*' , // FTP Plug-in
+'PxFunnel (Continuous)'          : '^fc[A-Z0-9][A-Za-z0-9|_]*'  , // Funnel
+'PxFunnel (Sort)'                : '^fo[A-Z0-9][A-Za-z0-9|_]*'  , // Funnel
+'PxFunnel (Sequence)'            : '^fq[A-Z0-9][A-Za-z0-9|_]*'  , // Funnel
+'PxGeneric'                      : '^gn[A-Z0-9][A-Za-z0-9|_]*'  , // Generic
+'PxJoin (Inner)'                 : '^ji[A-Z0-9][A-Za-z0-9|_]*'  , // Inner join
+'PxJoin (Full Outer)'            : '^jf[A-Z0-9][A-Za-z0-9|_]*'  , // Full Outer join
+'PxJoin (Left Outer)'            : '^jl[A-Z0-9][A-Za-z0-9|_]*'  , // Left Outer join
+'PxJoin (Right Outer)'           : '^jr[A-Z0-9][A-Za-z0-9|_]*'  , // Right Outer join
+'PxLookup'                       : '^lu[A-Z0-9][A-Za-z0-9|_]*'  , // Lookup
+'PxMerge'                        : '^mg[A-Z0-9][A-Za-z0-9|_]*'  , // Merge
+'PxModify'                       : '^md[A-Z0-9][A-Za-z0-9|_]*'  , // Modify
+'PivotPX'                        : '^pv[A-Z0-9][A-Za-z0-9|_]*'  , // Pivot
+'PxPivot'                        : '^pv[A-Z0-9][A-Za-z0-9|_]*'  , // Pivot Enterprise
+'PxRemDup'                       : '^rd[A-Z0-9][A-Za-z0-9|_]*'  , // Remove Duplicates
+'PxSCD'                          : '^scd[A-Z0-9][A-Za-z0-9|_]*' , // Slowly Changing Dimension
+'PxSort (Standard)'              : '^so[A-Z0-9][A-Za-z0-9|_]*'  , // Standard Sort
+'PxSort (Unique)'                : '^su[A-Z0-9][A-Za-z0-9|_]*'  , // Unique Sort
+'PxSurrogateKeyGenerator'        : '^sk[A-Z0-9][A-Za-z0-9|_]*'  , // Surrogate Key Generator (1)
+'PxSurrogateKeyGeneratorN'       : '^sk[A-Z0-9][A-Za-z0-9|_]*'  , // Surrogate Key Generator (2)
+'PxSwitch'                       : '^sw[A-Z0-9][A-Za-z0-9|_]*'  , // Switch
+'PxWaveGenerator'                : '^wg[A-Z0-9][A-Za-z0-9|_]*'  , // Wave Generator
+// Real Time ------------------------------------------------------------------
+'CDCTStagePX'                    : '^cdc[A-Z0-9][A-Za-z0-9|_]*' , // CDC Transaction
+'XMLStagePX'                     : '^hdx[A-Z0-9][A-Za-z0-9|_]*' , // Hierarchical Data
+'ILOGJRulesConnectorPX'          : '^ij[A-Z0-9][A-Za-z0-9|_]*'  , // ILOG JRules Connector
+'PxRTIInput'                     : '^isi[A-Z0-9][A-Za-z0-9|_]*' , // ISD Input
+'PxRTIOutput'                    : '^iso[A-Z0-9][A-Za-z0-9|_]*' , // ISD Output
+'JClientPX'                      : '^jc[A-Z0-9][A-Za-z0-9|_]*'  , // Java Client
+'JavaStagePX'                    : '^jint[A-Z0-9][A-Za-z0-9|_]*', // Java Integration
+'JTransformerPX'                 : '^jt[A-Z0-9][A-Za-z0-9|_]*'  , // Java Transformer
+'JAQLConnectorPX'                : '^mr[A-Z0-9][A-Za-z0-9|_]*'  , // MapReduce Connector
+'StreamsConnectorPX'             : '^str[A-Z0-9][A-Za-z0-9|_]*' , // Streams Connector
+'WSClientPX'                     : '^wsc[A-Z0-9][A-Za-z0-9|_]*' , // Web Services Client
+'WSTransformerPX'                : '^wst[A-Z0-9][A-Za-z0-9|_]*' , // Web Services Transformer
+'MQSeriesPX'                     : '^mq[A-Z0-9][A-Za-z0-9|_]*'  , // WebSphere MQ Stage has been DEPRECATED
+'WebSphereMQConnectorPX'         : '^mq[A-Z0-9][A-Za-z0-9|_]*'  , // WebSphere MQ Connector
+'XMLInputPX'                     : '^xmi[A-Z0-9][A-Za-z0-9|_]*' , // XML Input
+'XMLOutputPX'                    : '^xmo[A-Z0-9][A-Za-z0-9|_]*' , // XML Output
+'XMLTransformerPX'               : '^xmt[A-Z0-9][A-Za-z0-9|_]*' , // XML Transformer
+// Restructure ----------------------------------------------------------------
+'PxColumnExport'                 : '^ce[A-Z0-9][A-Za-z0-9|_]*'  , // ColumnExport
+'PxColumnImport'                 : '^ci[A-Z0-9][A-Za-z0-9|_]*'  , // ColumnImport
+'PxCombineRecords'               : '^cb[A-Z0-9][A-Za-z0-9|_]*'  , // CombineRecords
+'PxMakeSubRec'                   : '^msr[A-Z0-9][A-Za-z0-9|_]*' , // MakeSub-Record
+'PxMakeVect'                     : '^mvt[A-Z0-9][A-Za-z0-9|_]*' , // MakeVector
+'PxPromoteSubRec'                : '^psr[A-Z0-9][A-Za-z0-9|_]*' , // PromoteSub-Record
+'PxSplitSubRec'                  : '^ssr[A-Z0-9][A-Za-z0-9|_]*' , // SplitSub-Record
+'PxSplitVect'                    : '^svt[A-Z0-9][A-Za-z0-9|_]*' , // SplitVector
+// Containers -----------------------------------------------------------------
+'Container (Local)'              : '^lc[A-Z0-9][A-Za-z0-9|_]*'  , // Local Container
+'Container (Shared)'             : '^sc[A-Z0-9][A-Za-z0-9|_]*'    // Shared Container
+]
+
+item.graph.V.comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' (${it.stageType}) has an incorrectly formatted name.  Its name should match the regular expression '${it.pattern}'."} { 
+
+	if (it.stageType != null) {
+		
+		def regex = null;
+
+		if (map.containsKey(it.stageType)) {
+			regex = map[it.stageType];
+		} 
+		
+		if ((it.stageType == "PxFunnel") && (it.operator == "funnel")) {
+			regex = map["PxFunnel (Continuous)"];
+		}
+		
+		if ((it.stageType == "PxFunnel") && (it.operator == "sortfunnel")) {
+			regex = map["PxFunnel (Sort)"];
+		}
+		
+		if ((it.stageType == "PxFunnel") && (it.operator == "sequence")) {
+			regex = map["PxFunnel (Sequence)"];
+		}
+		
+		if ((it.stageType == "PxJoin") && (it.operator == "innerjoin")) {
+			regex = map["PxJoin (Inner)"];
+		}
+		
+		if ((it.stageType == "PxJoin") && (it.operator == "fullouterjoin")) {
+			regex = map["PxJoin (Full Outer)"];
+		}
+		
+		if ((it.stageType == "PxJoin") && (it.operator == "leftouterjoin")) {
+			regex = map["PxJoin (Left Outer)"];
+		}
+		
+		if ((it.stageType == "PxJoin") && (it.operator == "rightouterjoin")) {
+			regex = map["PxJoin (Right Outer)"];
+		}
+		
+		if ((it.stageType == "PxSort") && (it.unique == " ")) {
+			regex = map["PxSort (Standard)"]
+		}
+
+		if ((it.stageType == "PxSort") && (it.unique == "unique")) {
+			regex = map["PxSort (Unique)"]
+		}
+
+		if ((it.stageType == "container") && (it.ContainerType == "0")) {
+			regex = map["Container (Shared)"];
+		}
+		
+		if ((it.stageType == "container") && (it.ContainerType == "1")) {
+			regex = map["Container (Local)"];
+		}
+		
+		if (regex != null) {
+			it.pattern = regex;
+			return it.stageName.matches(regex);
+		}
+		
+	}
+	return true;
+
+};
+

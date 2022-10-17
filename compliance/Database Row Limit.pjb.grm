@@ -1,0 +1,79 @@
+/*
+ * Identifies Database Row Limits (Oracle, Teradata, Netezza, DB2, ODBC)
+ *
+ * Rationale:
+ * Row limits set on the Database stages are options developers might use during development
+ * and unit testing to allow faster development. Leaving these options set may have unintended 
+ * consequences should the job be deployed into test and production environments. 
+ * 
+ */
+
+ // stage to file property mapping
+def stageProperties = [
+   'OracleConnectorPX'               :[ names: ['XMLProperties'], query: 'Usage.LimitRows.Limit' ],
+   'TeradataConnectorPX'             :[ names: ['XMLProperties'], query: 'Usage.LimitRows.Limit' ],
+   'NetezzaConnectorPX'              :[ names: ['XMLProperties'], query: 'Usage.LimitRows.Limit' ],
+   'DB2ConnectorPX'                  :[ names: ['XMLProperties'], query: 'Usage.LimitRows.Limit' ],
+   'ODBCConnectorPX'                 :[ names: ['XMLProperties'], query: 'Usage.LimitRows.Limit' ],
+   'HiveConnectorPX'                 :[ names: ['XMLProperties'], query: 'Usage.LimitRows.Limit' ],
+   'JDBCConnectorPX'                 :[ names: ['XMLProperties'], query: 'Usage.LimitRows.Limit' ]
+]
+
+
+ def dbStage = { stage ->
+
+    // the properties for this stage type
+    def property = stageProperties[stage.stageType]
+
+    // check if the stage is in the list of stage properties
+    if (!property) {
+        return false
+    }
+
+    // check if the stage has an output link
+    if(!stage.out.pin) {
+        return false
+    }
+
+    // build all paths associated with this stage
+    def paths = []
+
+    property.names.each { propertyName->
+        // get the paths from the stage
+        if (stage[propertyName] != null) {
+            paths.add(stage[propertyName])
+        }
+
+        // get paths from input/output pins
+        stage.property(propertyName).fill(paths)
+    }
+
+    // flatten any sub arrays
+    paths = paths.flatten()
+    
+    // turn path properties into strings considering any property hierarchy queries
+    paths = paths.findResults{ path->
+        
+            if (property.query) {
+                // evaluate the path using supplied query
+                path = Eval.x(path, "x.${property.query}").toString()
+
+                // filter blank strings which occur when query does not match the property hierarchy
+                path = path?:null
+
+            } else {
+                path = path?.toString()       
+            }
+            
+            return path
+        }
+
+    if (paths[1]) {
+        return true
+    }
+
+    return false
+}
+
+item.graph.V.stage.filter(dbStage)
+    .comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' has a row limit set to ${it.value}."}

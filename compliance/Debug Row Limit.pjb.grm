@@ -1,0 +1,43 @@
+/*
+ * Identifies row limits in debug stages (Peek, Sample, Tail)
+ *
+ * Rationale:
+ * Debug stages are options developers might use during development to enable debugging
+ * and testing. Leaving these options set may have unintended consequences should the job 
+ * be deployed into test and production environments. 
+ */
+
+ // stage to file property mapping
+def stageProperties = [
+    'PxPeek'                        : 'nrecs'   ,
+    'PxSample'                      : 'percent' ,
+    'PxTail'                        : 'nrecs'   
+]
+
+
+ def debugStage = { stage ->
+
+     // the properties for this stage type
+    def propertyName = stageProperties[stage.stageType]
+
+    // check if the stage is in the list of stage properties
+    if (!propertyName) {
+        return false
+    }
+
+    if ( stage.property(propertyName).next() ) {
+        return true
+    }
+
+    return false
+}
+
+item.graph.V.stage.filter(debugStage).comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' has row limit set to ${it.value}."} { 
+    // the properties for this stage type
+    def propertyName = stageProperties[it.stageType]
+    
+    it.value = it.property(propertyName).next()
+
+    return false
+};
+

@@ -1,0 +1,28 @@
+/*
+* This rule detects the use of stages in Parallel Jobs that don't support automatic lineage
+*
+* Rationale:
+* If a stage does npt support lineage, IGC cannot determine a complete set of dependencies by which
+* MettleCI builds its dependency tree
+*
+*/
+
+def noLineage = [
+    'DRSConnector', 
+    'SAPIDocExtractConnector',
+    'SAPIDocLoadConnector',
+    'TeradataConnector',  
+//    'Teradata Enterprise',     If we ever find the proper name for this stage, uncomment this line please ;-)
+    'Teradata'       
+] as Set
+
+item.graph.V.stage.comply{"The ${config.readableStageTypes[it.stageType] ?: it.stageType} stage used by '${it.stageName}' does not support lineage."} { 
+    if (noLineage.contains(it.stageType)) {
+        return false
+    }
+    else if (it.stageType == 'ODBCConnector' && item.xmetaVersion < "11.5.0.0") {
+        return false
+    }
+    
+    return true
+};

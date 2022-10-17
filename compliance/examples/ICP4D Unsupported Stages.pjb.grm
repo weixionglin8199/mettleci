@@ -1,0 +1,65 @@
+/*
+* Lists the stages that are not yet supported by IBM Cloud Pak for Data
+*
+* Based on the IBM documentation:
+* https://docs-icpdata.mybluemix.net/transform/com.ibm.icpdata.doc/dfd/c_stages.html
+* https://docs-icpdata.mybluemix.net/transform/com.ibm.icpdata.doc/dfd/c_supported_conn_stgs.html
+*
+*/
+
+
+def set = [
+'PxBDFS',                         // Big Data File Stage
+'DB2ConnectorPX',                 // DB2 Connector
+'GreenplumConnectorPX',           // GreenPlum Connector
+'HiveConnectorPX',                // Hive Connector
+'JDBCConnectorPX',                // JDBC Connector
+'NetezzaConnectorPX',             // Netezza Connector
+'ODBCConnectorPX',                // ODBC Connector
+'OracleConnectorPX',              // Oracle Connector
+'TeradataConnectorPX',            // Teradata Connector
+'PxHead',                         // Head
+'PxPeek',                         // Peek
+'PxRowGenerator',                 // Row Generator
+'PxSample',                       // Sample
+'PxTail',                         // Tail
+'AmazonS3PX',                     // Amazon S3
+'PxDataSet',                      // Data Set
+'FileConnectorPX',                // File Connector
+'PxFileSet',                      // FileSet
+'PxLookupFileSet',                // Lookup FileSet - not mentioned in the connectors page, but mentioned in the lookup stage options
+'PxSequentialFile',               // Sequential File
+'CTransformerStage',              // Transformer
+'PxAggregator',                   // Aggregator
+'PxChangeApply',                  // Change Apply
+'PxChangeCapture',                // Change Capture
+'PxCompare',                      // Compare
+'PxCompress',                     // Compress
+'PxCopy',                         // Copy
+'PxDecode',                       // Decode
+'PxDifference',                   // Difference
+'PxEncode',                       // Encode
+'PxExpand',                       // Expand
+'PxFilter',                       // Filter
+'PxFunnel',                       // Funnel
+'PxJoin',                         // join
+'PxLookup',                       // Lookup
+'PxMerge',                        // Merge
+'PxRemDup',                       // Remove Duplicates
+'PxSort',                         // Standard Sort
+'PxSwitch',                       // Switch
+'KafkaConnectorPX',               // Kafka Transformer
+'WebSphereMQConnectorPX'          // WebSphere MQ Connector
+] as Set
+
+// I've kept these here because the ICPD documentation is fairly high-level. The yes/no is whether DFD supports it
+//'PxDB2'                          : 'No' , // DB2/UDB Enterprise
+//'PxNetezza'                      : 'No' , // Netezza Enterprise
+//'PxOdbc'                         : 'Yes', // ODBC Enterprise
+//'PxOracle'                       : 'No' , // Oracle Enterprise
+//'PxTeradata'                     : 'No' , // Teradata Enterprise
+//'TDMLoadPX'                      : 'No' , // Teradata Multiload
+//'LocalFileConnectorPX'           : 'No' , // File Connector - Engine Tier
+
+
+item.graph.V.stage.comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' is not currently supported by IBM Cloud Pak for Data."}{set.contains(it.stageType)};

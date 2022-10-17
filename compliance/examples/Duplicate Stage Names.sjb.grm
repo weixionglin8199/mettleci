@@ -1,0 +1,28 @@
+/*
+ * Duplicate Stage Names
+ *
+ * Detach duplicate stage names
+ * Note: Chances of occurance is rare, but not impossible espcially on legacy datastage instance
+ * 
+ */
+def stageNames = [:];
+
+item.graph.V.stage.filter { stage ->
+    if (stageNames[stage.stageName] == null) {
+        stageNames.put(stage.stageName, 1);
+    } else {
+        stageNames[stage.stageName] = stageNames[stage.stageName] + 1;
+    }
+    return true;
+}.iterate()
+
+def msg = "";
+stageNames.each {stageName, count ->
+	if (count > 1) {
+		msg = msg + "\n" + "${stageName}: Stage name duplicated ${count} times"
+	}
+}
+
+if (msg != "") {
+	compliance.failure(msg)
+}

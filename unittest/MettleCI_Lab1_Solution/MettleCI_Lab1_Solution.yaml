@@ -1,0 +1,15 @@
+---
+given:
+- stage: "Input1"
+  link: "Transform"
+  path: "Input1-Transform.csv"
+when:
+  job: "MettleCI_Lab1_Solution"
+  controller: null
+  parameters: {}
+then:
+- stage: "Output1"
+  link: "Transform"
+  path: "Output1-Transform.csv"
+  cluster: null
+  ignore: null

@@ -1,0 +1,32 @@
+/*
+ * Verifies that a job does not contain one or more prohibited stages
+ *
+ * Rationale:
+ * Some projects may wish to restrict certain stages from production ready jobs.  For example, 
+ * peek stages are usually included by developers as a debugging aid and therefore should be 
+ * removed after initial development. 
+ *
+ * The list of prohibited stages can be configured by updating the "prohibitedStages" variable
+ */
+
+// Mapping of file properties that holds the variables
+def prohibitedStages = [
+// File
+   'PxzOSFile',                 // zOSFile
+// Packs
+   'EssbaseConnectorPX',        // Essbase Connector
+   'PS_HRYPX',                  // Hierarchy for PeopleSoft Enterprise
+   'PeoplesoftOnePX',           // JD Edwards EnterpriseOne
+   'ORAAppsPX',                 // Oracle Applications Direct Access
+   'orahrchy_PX',               // Oracle Applications Hierarchy
+   'SALESFORCEJCConnectorPX',   // Salesforce
+   'Siebel_BCPX',               // Siebel BC Pack
+   'Siebel_DAPX',               // Siebel DA Pack
+   'Siebel_EIMPX',              // Siebel EIM Pack
+// Processing
+   'PxSVTransformer'            // BASIC Transformer
+]
+
+item.graph.V.stage.comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' uses a stage type (${it.stageType}) which is not permitted in Production code."} {
+    return !prohibitedStages.contains(it.stageType)
+}

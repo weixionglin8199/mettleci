@@ -1,0 +1,39 @@
+/*
+ * Identifies redundant sorts within a job
+ *
+ * Rationale:
+ * Sorting record data is the most expensive operation that can be performed by DataStage's Parallel Engine.  While 
+ * most experienced developers will arrange job logic to minimize the number of required sorts, there are valid
+ * patterns that use adjacent sort stages in conjunction with key change and cluster key flags.
+ *
+ * This rule will identify adjacent sort stages which do not create key change, cluster key or have keys flagged as
+ * "Don't Sort".  Where adjacent sort stages are discovered, one will either be redundant and should be removed or
+ * a developer has introduced a logic error by not including a key change, cluster key or "Don't sort" flag.
+ */
+ 
+def simpleSort = { stage ->
+    // filter anything that isn't a sort
+    if (stage.stageType != 'PxSort') {
+        return false
+    }
+    
+    // filter key change and cluster key changes
+    if ('flagKey'.equalsIgnoreCase(stage.flagKey) || 'flagCluster'.equalsIgnoreCase(stage.flagCluster)) {
+        return false
+    }
+    
+    // filter if we have keys flagged as "don't sort"
+    def sortModes = ['sorted', 'clustered']
+    for (def key in stage.key) { 
+        
+        if (sortModes.contains(key[/sorted\\clustered/]) == true) {
+            return false
+        }
+    }
+    
+    // we have a simple sort!
+    return true
+}
+ 
+item.graph.V.stage.filter(simpleSort).out.stage.filter(simpleSort).dedup()
+    .comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' is adjacent to another Sort stage. Remove the redundant Sort or consider changing the 'Sort Key Mode', 'Key Change Column' or 'Cluster Key Change Column' properties."}

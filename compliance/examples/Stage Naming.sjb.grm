@@ -1,0 +1,120 @@
+/*
+*
+* Stage Naming Standards for Server Jobs
+*
+* Verifies that job stage names match the Data Migrators naming standards.
+* All naming standards are documented on the Data Migrators wiki:
+* https://datamigrators.atlassian.net/wiki/display/MCI/DataStage+Naming+Standards
+*
+* Rationale:
+* Our naming standards are designed to reduce the amount of effort required for developers to
+* understand what a job is doing without needing to inspect each stage on the job canvas and to quickly
+* identify job stages from text based messages such as director errors and compliance rule failures.
+*
+* In most cases, this is achieved by having a prefix that reflects the stage type.  However, for stages
+* such as joins and funnels, the stage names provide additional information which cannot be determined
+* without inspecting the stage in question (ie. inner/left/right join).
+*
+* Enforced naming standards of this nature also allows future IP to easily determine stage types based
+* on the name without needing to refer to IGC or XMETA.  Additionally, these naming standards help prevent
+* trivial feedback from external vendors during data migration/warehouse "audits".
+*/
+
+def map = [
+// Server Database ------------------------------------------------------------
+'DB2Connector'                   : '^db2[A-Z0-9][A-Za-z0-9|_]*'  , // Ibm Infosphere DB2 Connector
+'DSDB2'                          : '^db2[A-Z0-9][A-Za-z0-9|_]*'  , // DB2 Stage has been DEPRECATED - Replaced By The DB2 Connector Stage
+'UDBLoad'                        : '^db2[A-Z0-9][A-Za-z0-9|_]*'  , // DB2 UDB Load has been DEPRECATED - Replaced By The DB2 Connector Stage
+'DRS'                            : '^drs[A-Z0-9][A-Za-z0-9|_]*'  , // Dynamic RDBMS Stage has been DEPRECATED - Replaced By the Dynamic RDBMS Connector Stage
+'DRSConnector'                   : '^drs[A-Z0-9][A-Za-z0-9|_]*'  , // Dynamic RDBMS Connector
+'InfmxCLI'                       : '^ifx[A-Z0-9][A-Za-z0-9|_]*'  , // Informix Data Access
+'INFBLK10'                       : '^ifx[A-Z0-9][A-Za-z0-9|_]*'  , // Informix Bulk Loader
+'XPSLoad'                        : '^xps[A-Z0-9][A-Za-z0-9|_]*'  , // Informix XPS Bulk Loader
+'NetezzaConnector'               : '^net[A-Z0-9][A-Za-z0-9|_]*'  , // Netezza Connector
+'CODBCStage'                     : '^odbc[A-Z0-9][A-Za-z0-9|_]*' , // ODBC Data Access
+'ODBCConnector'                  : '^odbc[A-Z0-9][A-Za-z0-9|_]*' , // IBM Infosphere ODBC Connector
+'ORABULK'                        : '^ora[A-Z0-9][A-Za-z0-9|_]*'  , // Oracle Bulk Loader
+'OracleConnector'                : '^ora[A-Z0-9][A-Za-z0-9|_]*'  , // Oracle Connector
+'ORAOCI9'                        : '^ora[A-Z0-9][A-Za-z0-9|_]*'  , // Oracle OCI Stage has been DEPRECATED - Replaced By The Oracle Connector Stage
+'ORAOCIBL'                       : '^ora[A-Z0-9][A-Za-z0-9|_]*'  , // Oracle OCI Bulk Loader Stage has been DEPRECATED - Replaced By The Oracle Connector Stage
+'rdbload'                        : '^rb[A-Z0-9][A-Za-z0-9|_]*'   , // Redbrick Bulk Loader
+'STP'                            : '^stp[A-Z0-9][A-Za-z0-9|_]*'  , // The Stored Procedure Stage
+'BCPLOAD'                        : '^bcp[A-Z0-9][A-Za-z0-9|_]*'  , // Sybase Sql Server Bulk Loader
+'IQBulk12'                       : '^syb[A-Z0-9][A-Za-z0-9|_]*'  , // Sybase IQ 12 Bulk Loader
+'SYBASEOC'                       : '^syb[A-Z0-9][A-Za-z0-9|_]*'  , // Sybase Data Access
+'Teradata'                       : '^tera[A-Z0-9][A-Za-z0-9|_]*' , // Teradata Stage has been DEPRECATED - Replaced By The Teradata Connector Stage
+'TeradataConnector'              : '^tera[A-Z0-9][A-Za-z0-9|_]*' , // IBM Infosphere Teradata Connector
+'Terabulk'                       : '^tera[A-Z0-9][A-Za-z0-9|_]*' , // Teradata Bulk Stage has been DEPRECATED - Replaced By The Teradata Connector Stage
+'TDMLoad'                        : '^tera[A-Z0-9][A-Za-z0-9|_]*' , // Teradata Multiload/Tpump/Fastexport Stage.
+'CUniDataStage'                  : '^ud[A-Z0-9][A-Za-z0-9|_]*'   , // Unidata Data Access
+'CUvStage'                       : '^uv[A-Z0-9][A-Za-z0-9|_]*'   , // Universe Data Access
+// Server File ----------------------------------------------------------------
+'CFF'                            : '^cff[A-Z0-9][A-Za-z0-9|_]*'  , // Complex Flat File Stage.
+'Folder'                         : '^fol[A-Z0-9][A-Za-z0-9|_]*'  , // Read Or Write Data As Files In A Directory
+'CHashedFileStage'               : '^hf[A-Z0-9][A-Za-z0-9|_]*'   , // Typically A Keyed Reference File
+'CSeqFileStage'                  : '^seq[A-Z0-9][A-Za-z0-9|_]*'  , // Sequential Data Access
+// Server Packs ---------------------------------------------------------------
+'PS_HRY'                         : '^hpe[A-Z0-9][A-Za-z0-9|_]*'  , // Peoplesoft Enterprise Hierarchy Plug-In
+'PeoplesoftOne'                  : '^jde[A-Z0-9][A-Za-z0-9|_]*'  , // JD Edwards Enterprise One Stage
+'ORAApps'                        : '^oad[A-Z0-9][A-Za-z0-9|_]*'  , // Oracle Applications Direct Access Stage
+'orahrchy'                       : '^oah[A-Z0-9][A-Za-z0-9|_]*'  , // Oracle Applications Hierarchy Stage
+'Siebel_BC'                      : '^sbbc[A-Z0-9][A-Za-z0-9|_]*' , // Siebel Business Component Access Stage
+'Siebel_DA'                      : '^sbda[A-Z0-9][A-Za-z0-9|_]*' , // Siebel Direct Access Stage Version 3.2.2
+'Siebel_EIM'                     : '^sieb[A-Z0-9][A-Za-z0-9|_]*' , // Siebel Stage
+// Server Processing ----------------------------------------------------------
+'AGGREGATOR'                     : '^ag[A-Z0-9][A-Za-z0-9|_]*'   , // Form Groups Or Perform Other Aggregate Functions
+'ftp'                            : '^ftp[A-Z0-9][A-Za-z0-9|_]*'  , // FTP Data Access
+'CInterProcess'                  : '^ipc[A-Z0-9][A-Za-z0-9|_]*'  , // Communication Channel Between Stages
+'CCollector'                     : '^col[A-Z0-9][A-Za-z0-9|_]*'  , // Merge Up To 64 Links Into Single Output Link
+'CPartitioner'                   : '^par[A-Z0-9][A-Za-z0-9|_]*'  , // Partition Data Out To Multiple Links
+'MERGE'                          : '^mg[A-Z0-9][A-Za-z0-9|_]*'   , // Merge Data Access
+'Pivot'                          : '^pv[A-Z0-9][A-Za-z0-9|_]*'   , // Pivot Plugin Version 1.0.0
+'RowMerger'                      : '^rm[A-Z0-9][A-Za-z0-9|_]*'   , // Row Merger Active Plug-In Stage
+'RowSplitter'                    : '^rs[A-Z0-9][A-Za-z0-9|_]*'   , // Row Splitter Active Plug-In Stage
+'sort'                           : '^so[A-Z0-9][A-Za-z0-9|_]*'   , // Sort
+// Server Real-Time -----------------------------------------------------------
+'RTIInput'                       : '^isi[A-Z0-9][A-Za-z0-9|_]*'  , // Information Services Input Stage
+'RTIOutput'                      : '^iso[A-Z0-9][A-Za-z0-9|_]*'  , // Information Services Output Stage
+'JClient'                        : '^jc[A-Z0-9][A-Za-z0-9|_]*'   , // Transformer For Java Passive Plug-In Stage
+'JTransformer'                   : '^jt[A-Z0-9][A-Za-z0-9|_]*'   , // Transformer For Java Active Plug-In Stage
+'WSClient'                       : '^wsc[A-Z0-9][A-Za-z0-9|_]*'  , // Passive Web Service Plug-In Stage
+'WSTransformer'                  : '^wst[A-Z0-9][A-Za-z0-9|_]*'  , // Active Web Service Plug-In Stage
+'WebSphereMQConnector'           : '^mq[A-Z0-9][A-Za-z0-9|_]*'   , // IBM Websphere MQ Connector
+'XMLInput'                       : '^xmi[A-Z0-9][A-Za-z0-9|_]*'  , // XML Input Stage
+'XMLOutput'                      : '^xmo[A-Z0-9][A-Za-z0-9|_]*'  , // XML Output Stage
+'XMLTransformer'                 : '^xmt[A-Z0-9][A-Za-z0-9|_]*'  , // XML Transformer Stage
+// Containers -----------------------------------------------------------------
+'Container (Local)'              : '^lc[A-Z0-9][A-Za-z0-9|_]*'   , // Local Container
+'Container (Shared)'             : '^sc[A-Z0-9][A-Za-z0-9|_]*'   , // Shared Container
+// All Processing -------------------------------------------------------------
+'CTransformerStage'              : '^tx[A-Z0-9][A-Za-z0-9|_]*'     // Transformer
+]
+
+item.graph.V.comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' (${it.stageType}) has an incorrectly formatted name.  Its name should match the regular expression '${it.pattern}'."} { 
+
+	if (it.stageType != null) {
+		
+		def regex = null;
+
+		if (map.containsKey(it.stageType)) {
+			regex = map[it.stageType];
+		}
+
+		if ((it.stageType == "container") && (it.ContainerType == "0")) {
+			regex = map["Container (Shared)"];
+		}
+		
+		if ((it.stageType == "container") && (it.ContainerType == "1")) {
+			regex = map["Container (Local)"];
+		}
+		
+		if (regex != null) {
+			it.pattern = regex;
+			return it.stageName.matches(regex);
+		}
+		
+	}
+	return true;
+
+};
+

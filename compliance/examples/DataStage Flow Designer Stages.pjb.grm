@@ -1,0 +1,234 @@
+/*
+* Lists the stages that are not yet supported by IBM Data Flow Designer
+*
+* Rationale:
+* For the Upgrade scenario, it will be useful in the future to know which jobs can be 
+* fully supported using Data Flow Designer. Each job that 'fails' this rule needs the 
+* standard DS Client available in order to be maintained.
+*
+* As new stages become supported, change 'No' in the list below to 'Yes'.
+*
+*/
+
+def map = [
+// Data Quality ---------------------------------------------------------------
+'IADataRule'                     : 'No' , // Data Rules
+'ExceptionStage'                 : 'No' , // Exceptions
+'Investigate'                    : 'No' , // Investigate
+'MatchFrequency'                 : 'No' , // Match Frequency
+'MasterDataManagementConnectorPX': 'No' , // MDM Connector
+'MNS'                            : 'No' , // Multi-National Standardization (MNS)
+'UnduplicateMatch'               : 'No' , // One Source Match
+'SQA'                            : 'No' , // Standardization Quality Assessment (SQA)
+'Standardize'                    : 'No' , // Standardize
+'Survive'                        : 'No' , // Survive
+'ReferenceMatch'                 : 'No' , // Two Source Match
+// Database -------------------------------------------------------------------
+'CassandraConnectorPX'           : 'No' , // Cassandra Federation
+'MetaCassandraConnectorPX'       : 'No' , // Cassandra Federation
+'PXClassicFederation'            : 'No' , // Classic Federation
+'CognosTM1ConnectorPX'           : 'No' , // Cognos TM1 Connector
+'DB2ConnectorPX'                 : 'Yes', // DB2 Connector
+'DSDB2PX'                        : 'No' , // DB2 UDB API Stage has been DEPRECATED
+'UDBLoadPX'                      : 'No' , // DB2 UDB Load has been DEPRECATED
+'PxDB2'                          : 'No' , // DB2/UDB Enterprise
+'PxDB2Z'                         : 'No' , // DB2Z has been DEPRECATED
+'DTStagePX'                      : 'No' , // Distributed Transaction
+'DRSConnectorPX'                 : 'No' , // DRS Connector
+'DRSPX'                          : 'No' , // Dynamic RDBMS has been DEPRECATED
+'GreenplumConnectorPX'           : 'Yes', // GreenPlum Connector
+'InfmxCLIPX'                     : 'No' , // Informix CLI
+'PxInformixXPS'                  : 'No' , // Informix Enterprise
+'INFBLK10PX'                     : 'No' , // Informix Load
+'XPSLoadPX'                      : 'No' , // Informix XPS Load
+'Pxiway'                         : 'No' , // iWay Enterprise
+'JDBCConnectorPX'                : 'Yes', // JDBC Connector
+'NetezzaConnectorPX'             : 'Yes', // Netezza Connector
+'PxNetezza'                      : 'No' , // Netezza Enterprise
+'ODBCConnectorPX'                : 'Yes', // ODBC Connector
+'PxOdbc'                         : 'Yes', // ODBC Enterprise
+'OracleConnectorPX'              : 'Yes', // Oracle Connector
+'PxOracle'                       : 'No' , // Oracle Enterprise
+'ORAOCIBLPX'                     : 'No' , // Oracle OCI Load has been DEPRECATED
+'rdbloadPX'                      : 'No' , // RedBrick Load
+'SnowflakeConnectorPX'           : 'No' , // Snowflake Connector
+'Pxsqlsvr'                       : 'Yes', // SQLServer Enterprise
+'STPPX'                          : 'No' , // Stored Procedure
+'PxSybase'                       : 'No' , // Sybase Enterprise
+'IQBulk12PX'                     : 'No' , // Sybase IQ 12 Load
+'SYBASEOCPX'                     : 'No' , // Sybase OC
+'TeradataPX'                     : 'No' , // Teradata API has been DEPRECATED
+'TeradataConnectorPX'            : 'Yes', // Teradata Connector
+'PxTeradata'                     : 'No' , // Teradata Enterprise
+'TerabulkPX'                     : 'No' , // Teradata Load has been DEPRECATED
+'TDMLoadPX'                      : 'No' , // Teradata Multiload
+// Debug ----------------------------------------------------------------------
+'PxColumnGenerator'              : 'No' , // Column Generator
+'PxHead'                         : 'Yes', // Head
+'PxPeek'                         : 'Yes', // Peek
+'PxRowGenerator'                 : 'Yes', // Row Generator
+'PxSample'                       : 'Yes', // Sample
+'PxTail'                         : 'Yes', // Tail
+'PxWriteRangeMap'                : 'No' , // Write Range Map
+// File -----------------------------------------------------------------------
+'AzureBlobStorageConnectorPX'    : 'No' , // Azure Blob Storage Connector
+'AzureFileStorageConnectorPX'    : 'No' , // Azure File Storage Connector
+'AzureStorageConnectorPX'        : 'No' , // Azure Storage Connector
+'AmazonS3PX'                     : 'Yes', // Amazon S3
+'cloudobjectstoragePX'           : 'No' , // Cloud Object Storage
+'PxCFF'                          : 'No' , // Complex Flat File
+'PxDataSet'                      : 'Yes', // Data Set
+'PxExternalSource'               : 'No' , // External Source
+'PxExternalTarget'               : 'No' , // External Target
+'FileConnectorPX'                : 'Yes', // File Connector
+'LocalFileConnectorPX'           : 'No' , // File Connector - Engine Tier
+'HDFSFileConnectorPX'            : 'No' , // File Connector - HDFS
+'PxFileSet'                      : 'Yes', // FileSet
+'PxLookupFileSet'                : 'No' , // Lookup FileSet
+'PxSequentialFile'               : 'Yes', // Sequential File
+'UnstructuredDataConnectorPX'    : 'No' , // Unstructured Data
+'PxzOSFile'                      : 'No' , // zOSFile
+// Packs ----------------------------------------------------------------------
+'EssbaseConnectorPX'             : 'No' , // Essbase Connector
+'PS_HRYPX'                       : 'No' , // Hierarchy for PeopleSoft Enterprise
+'PeoplesoftOnePX'                : 'No' , // JD Edwards EnterpriseOne
+'ORAAppsPX'                      : 'No' , // Oracle Applications Direct Access
+'orahrchy_PX'                    : 'No' , // Oracle Applications Hierarchy
+'SALESFORCEJCConnectorPX'        : 'No' , // Salesforce
+'Siebel_BCPX'                    : 'No' , // Siebel BC Pack
+'Siebel_DAPX'                    : 'No' , // Siebel DA Pack
+'Siebel_EIMPX'                   : 'No' , // Siebel EIM Pack
+// Processing -----------------------------------------------------------------
+'CTransformerStage'              : 'Yes', // Transformer
+'PxSVTransformer'                : 'No' , // BASIC Transformer
+'PxAggregator'                   : 'Yes', // Aggregator
+'PxBLM'                          : 'No' , // Bloomfilter
+'PxChangeApply'                  : 'Yes', // Change Apply
+'PxChangeCapture'                : 'No' , // Change Capture
+'PxChecksum'                     : 'No' , // Checksum
+'PxCompare'                      : 'Yes', // Compare
+'PxCompress'                     : 'Yes', // Compress
+'PxCopy'                         : 'Yes', // Copy
+'DMConnectorPX'                  : 'No' , // Data Masking  
+'PxDecode'                       : 'Yes', // Decode
+'PxDifference'                   : 'Yes', // Difference
+'PxEncode'                       : 'Yes', // Encode
+'PxExpand'                       : 'Yes', // Expand
+'PxExternalFilter'               : 'No' , // External Filter
+'PxFilter'                       : 'Yes', // Filter
+'PxFTP'                          : 'Yes', // FTP Enterprise
+'ftpPX'                          : 'No' , // FTP Plug-in
+'PxFunnel (Continuous)'          : 'Yes', // Funnel
+'PxFunnel (Sort)'                : 'Yes', // Funnel
+'PxFunnel (Sequence)'            : 'Yes', // Funnel
+'PxGeneric'                      : 'No' , // Generic
+'PxJoin (Inner)'                 : 'Yes', // Inner join
+'PxJoin (Full Outer)'            : 'Yes', // Full Outer join
+'PxJoin (Left Outer)'            : 'Yes', // Left Outer join
+'PxJoin (Right Outer)'           : 'Yes', // Right Outer join
+'PxLookup'                       : 'Yes', // Lookup
+'PxMerge'                        : 'Yes', // Merge
+'PxModify'                       : 'No' , // Modify
+'PivotPX'                        : 'No' , // Pivot
+'PxPivot'                        : 'No' , // Pivot Enterprise
+'PxRemDup'                       : 'Yes', // Remove Duplicates
+'PxSCD'                          : 'No' , // Slowly Changing Dimension
+'PxSort (Standard)'              : 'Yes', // Standard Sort
+'PxSort (Unique)'                : 'Yes', // Unique Sort
+'PxSurrogateKeyGenerator'        : 'No' , // Surrogate Key Generator (1)
+'PxSurrogateKeyGeneratorN'       : 'No' , // Surrogate Key Generator (2)
+'PxSwitch'                       : 'Yes', // Switch
+'PxWaveGenerator'                : 'No' , // Wave Generator
+// Real Time ------------------------------------------------------------------
+'CDCTStagePX'                    : 'No' , // CDC Transaction
+'XMLStagePX'                     : 'No' , // Hierarchical Data
+'ILOGJRulesConnectorPX'          : 'No' , // ILOG JRules Connector
+'PxRTIInput'                     : 'No' , // ISD Input
+'PxRTIOutput'                    : 'No' , // ISD Output
+'JClientPX'                      : 'No' , // Java Client
+'JavaStagePX'                    : 'No' , // Java Integration
+'JTransformerPX'                 : 'No' , // Java Transformer
+'JAQLConnectorPX'                : 'No' , // MapReduce Connector
+'KafkaConnectorPX'               : 'No' , // Kafka Transformer
+'StreamsConnectorPX'             : 'No' , // Streams Connector
+'WSClientPX'                     : 'No' , // Web Services Client
+'WSTransformerPX'                : 'No' , // Web Services Transformer
+'MQSeriesPX'                     : 'No' , // WebSphere MQ Stage has been DEPRECATED
+'WebSphereMQConnectorPX'         : 'Yes', // WebSphere MQ Connector
+'XMLInputPX'                     : 'No' , // XML Input
+'XMLOutputPX'                    : 'No' , // XML Output
+'XMLTransformerPX'               : 'No' , // XML Transformer
+// Restructure ----------------------------------------------------------------
+'PxColumnExport'                 : 'No' , // ColumnExport
+'PxColumnImport'                 : 'No' , // ColumnImport
+'PxCombineRecords'               : 'No' , // CombineRecords
+'PxMakeSubRec'                   : 'No' , // MakeSub-Record
+'PxMakeVect'                     : 'No' , // MakeVector
+'PxPromoteSubRec'                : 'No' , // PromoteSub-Record
+'PxSplitSubRec'                  : 'No' , // SplitSub-Record
+'PxSplitVect'                    : 'No' , // SplitVector
+// Containers -----------------------------------------------------------------
+'Container (Local)'              : 'No' , // Local Container
+'Container (Shared)'             : 'Yes'  // Shared Container
+]
+
+item.graph.V.comply{"The ${config.readableStageTypes[it.stageType] ?: it.stageType} stage used by '${it.stageName}' is not yet supported by IBM DataStage Flow Designer."} {
+	if (it.stageType != null) {
+		
+		def answer = '';
+
+		if (map.containsKey(it.stageType)) {
+			answer = map[it.stageType];
+		} 
+		
+		if ((it.stageType == "PxFunnel") && (it.operator == "funnel")) {
+			answer = map["PxFunnel (Continuous)"];
+		}
+		
+		if ((it.stageType == "PxFunnel") && (it.operator == "sortfunnel")) {
+			answer = map["PxFunnel (Sort)"];
+		}
+		
+		if ((it.stageType == "PxFunnel") && (it.operator == "sequence")) {
+			answer = map["PxFunnel (Sequence)"];
+		}
+		
+		if ((it.stageType == "PxJoin") && (it.operator == "innerjoin")) {
+			answer = map["PxJoin (Inner)"];
+		}
+		
+		if ((it.stageType == "PxJoin") && (it.operator == "fullouterjoin")) {
+			answer = map["PxJoin (Full Outer)"];
+		}
+		
+		if ((it.stageType == "PxJoin") && (it.operator == "leftouterjoin")) {
+			answer = map["PxJoin (Left Outer)"];
+		}
+		
+		if ((it.stageType == "PxJoin") && (it.operator == "rightouterjoin")) {
+			answer = map["PxJoin (Right Outer)"];
+		}
+		
+		if ((it.stageType == "PxSort") && (it.unique == " ")) {
+			answer = map["PxSort (Standard)"]
+		}
+
+		if ((it.stageType == "PxSort") && (it.unique == "unique")) {
+			answer = map["PxSort (Unique)"]
+		}
+
+		if ((it.stageType == "container") && (it.ContainerType == "0")) {
+			answer = map["Container (Shared)"];
+		}
+		
+		if ((it.stageType == "container") && (it.ContainerType == "1")) {
+			answer = map["Container (Local)"];
+		}
+		
+		if ((answer!= null) && (answer == "No")) {
+//			it.pattern = answer;
+			return it.stageName.matches(answer);
+		}
+	}
+	return (true);
+};

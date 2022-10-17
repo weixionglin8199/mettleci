@@ -1,0 +1,61 @@
+/*
+ * Verifies that a file is only referenced once in a DataStage job (Sequential File, Complex Flat
+ * File and DataSet)
+ *
+ * Rationale: 
+ * Sometimes developers will copy and paste stages rather than adding a new stage from the palette. 
+ * In doing so there is a risk that the developer may not update the reference to the filename 
+ * property which which may result in incorrect processing being performed by the ETL job.
+ * 
+ * Server jobs have valid scenarios where a single file stage will have input and output links, referring to the same file.
+ * Multiple references within a single stage should only count once for the purpose of this rule.
+ * 
+ */
+
+// stage to file property mapping
+def stageProperties = [
+    'CFF'                         : 'Path',
+    'CHashedFileStage'            : 'FileName',
+	'CSeqFileStage'				  : 'FileName'
+]
+
+def filenames = []
+
+// iterate through all stages in the graph
+item.graph.V.stage.filter { stage ->
+
+     // the properties for this stage type
+    def propertyName = stageProperties[stage.stageType]
+    def filenamesInStage = []
+
+    // check if the stage is in the list of stage properties
+    if (!propertyName) {
+        return false
+    }
+
+    if (stage[propertyName] != null) {
+        stage.property(propertyName).fill(filenamesInStage)
+    }
+
+    if (stage.out) {
+        stage.out.pin.property(propertyName).fill(filenamesInStage)
+    }
+
+    if (stage.in) {
+        stage.in.pin.property(propertyName).fill(filenamesInStage)
+    }
+
+    if (filenamesInStage != null) {
+        filenames.addAll(filenamesInStage.unique(mutate = false))
+    }
+
+    return true
+
+}.iterate()
+
+def duplicated = filenames.groupBy { it.toString() }.findAll { it.value.size() > 1} 
+
+for (file in duplicated.keySet())
+{
+	compliance.failure("File '${file}' referenced more than once")
+}

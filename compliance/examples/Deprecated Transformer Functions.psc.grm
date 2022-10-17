@@ -1,0 +1,34 @@
+/*
+ * Searches the generated transformer stage code in a DataStage parallel job
+ * for calls to deprecated functions
+ *
+ * Rationale:
+ * This is for an upgrade scenario where a Transformer uses a function which
+ * is not supported by the targdet DataStage version.
+ *
+ */
+ 
+def deprecatedTransformerFunctions = [
+// 'Deprecated Function'             :[ genFn: 'Function in OSH', replacement: 'Replacement Function' ],
+   'DateFromDaysSince'               :[ genFn: 'date_from_days_since', replacement: 'DateFromDaysSince2' ],
+   'DaysSinceFromDate'               :[ genFn: 'days_since_from_date', replacement: 'DaysSinceFromDate2' ],
+   'SecondsSinceFromTimestamp'       :[ genFn: 'seconds_since_from_timestamp', replacement: 'SecondsSinceFromTimestamp2' ],
+   'TimestampFromSecondsSince'       :[ genFn: 'timestamp_from_seconds_since', replacement: 'TimestampFromSecondsSince2' ]
+];
+
+def deprecated = []
+
+item.graph.V.stage.has('stageType', 'CTransformerStage').filter { theStage ->
+    def code = theStage.out.metabag.property("APT.TrxGenCode").next()
+
+    deprecatedTransformerFunctions.each {
+        if (code.indexOf(it.value.genFn + '(') > -1) {
+            deprecated.add("${config.readableStageTypes[theStage.stageType] ?: theStage.stageType} '${theStage.stageName}' uses deprecated function ${it.key}. Replace it with ${it.value.replacement}.")
+        }
+    }
+    return false;
+}.iterate()
+
+deprecated.each{
+    compliance.failure("${it.toString()}")
+}

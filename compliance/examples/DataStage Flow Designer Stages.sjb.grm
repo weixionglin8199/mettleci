@@ -1,0 +1,13 @@
+/*
+* Lists the stages that are not yet supported by IBM Data Flow Designer
+*
+* Rationale:
+* For the Upgrade scenario, it will be useful in the future to know which jobs can be 
+* fully supported using Data Flow Designer. Each job that 'fails' this rule needs the 
+* standard DS Client available in order to be maintained.
+*
+* As new stages become supported, change 'No' in the list below to 'Yes'.
+*
+*/
+
+compliance.failure("Server jobs are not supported by IBM DataStage Flow Designer.")

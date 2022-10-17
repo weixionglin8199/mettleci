@@ -1,0 +1,28 @@
+/*
+ * Detect duplicate stage names in a job
+ *
+ * This can create issues with Unit Testing and potentially other Information Server tools.
+ * The chances of occurrence is rare, but not impossible especially on legacy DataStage instances.
+ *
+ */
+def stageNames = [:];
+
+item.graph.V.stage.filter { stage ->
+    if (stageNames[stage.stageName] == null) {
+        stageNames.put(stage.stageName, 1);
+    } else {
+        stageNames[stage.stageName] = stageNames[stage.stageName] + 1;
+    }
+    return true;
+}.iterate()
+
+def msg = "";
+stageNames.each {stageName, count ->
+	if (count > 1) {
+		msg = msg + "\n" + "${stageName}: Stage name duplicated ${count} times"
+	}
+}
+
+if (msg != "") {
+	compliance.failure(msg)
+}

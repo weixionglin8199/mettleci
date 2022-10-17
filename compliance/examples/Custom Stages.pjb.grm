@@ -1,0 +1,207 @@
+/*
+* This rule detects the use of Custom stages in Parallel Jobs
+*
+* Rationale:
+* Custom stages may work for current version but may not work for newer version. 
+* This bring awareness of the use of custom stage, so it allows us to plan ahead when performing project upgrade
+*
+* HOW TO USE
+* builtinStages holds all the built-in stages, and the version it was made available
+* builtinStagesOnly holds built-in stages that only present in those stages
+*    For example:
+* 			QSLegacy was present in version 8.1, but not in 9.1 or above. 
+*           User may potentially create a custom stage just for backward compatibility
+*/
+
+def builtinStages = [
+		'container'							: 8.1,	// General
+		'ExceptionStage'					: 11.5, // Data Quality
+		'IADataRule'						: 9.1, 	// Data Quality
+		'Investigate'						: 8.1, 	// Data Quality
+		'MasterDataManagementConnectorPX'	: 11.5, // Data Quality
+		'MatchFrequency'					: 8.1, 	// Data Quality
+		'MNS'								: 8.1, 	// Data Quality
+		'QSLegacy'							: 8.1, 	// Data Quality
+		'ReferenceMatch'					: 8.1, 	// Data Quality
+		'SQA'								: 9.1, 	// Data Quality
+		'Standardize'						: 8.1, 	// Data Quality
+		'Survive'							: 8.1, 	// Data Quality
+		'UnduplicateMatch'					: 8.1, 	// Data Quality
+		'WAVES'								: 8.1, 	// Data Quality
+		'CassandraConnectorPX'				: 11.7,	// Database
+		'CognosTM1ConnectorPX'				: 11.5, // Database
+		'DB2ConnectorPX'					: 8.1, 	// Database
+		'DRSConnectorPX'					: 9.1, 	// Database
+		'DRSPX'								: 8.1, 	// Database
+		'DSDB2PX'							: 8.1, 	// Database
+		'DTStagePX'							: 8.1, 	// Database
+		'GreenplumConnectorPX'				: 11.5, // Database
+		'HiveConnectorPX'					: 11.5, // Database
+		'INFBLK10PX'						: 8.1, 	// Database
+		'InfmxCLIPX'						: 8.1, 	// Database
+		'IQBulk12PX'						: 8.1, 	// Database
+		'JDBCConnectorPX'					: 9.1, 	// Database
+		'NetezzaConnectorPX'				: 9.1, 	// Database
+		'ODBCConnectorPX'					: 8.1, 	// Database
+		'OracleConnectorPX'					: 8.1, 	// Database
+		'ORAOCIBLPX'						: 8.1, 	// Database
+		'PXClassicFederation'				: 8.1, 	// Database
+		'PxDB2'								: 8.1, 	// Database
+		'PxDB2Z'							: 8.1, 	// Database
+		'PxInformixXPS'						: 8.1, 	// Database
+		'Pxiway'							: 8.1, 	// Database
+		'PxNetezza'							: 8.1, 	// Database
+		'PxOdbc'							: 8.1, 	// Database
+		'PxOracle'							: 8.1, 	// Database
+		'Pxsqlsvr'							: 8.1,	// Database (Confirm prensent in 8.7. But 8.1 is just a guess)
+		'PxSybase'							: 8.1, 	// Database
+		'PxTeradata'						: 8.1, 	// Database
+		'rdbloadPX'							: 8.1, 	// Database
+		'SnowflakeConnectorPX'				: 11.7, // Database
+		'STPPX'								: 8.1, 	// Database
+		'SYBASEOCPX'						: 8.1, 	// Database
+		'TDMLoadPX'							: 8.1, 	// Database
+		'TerabulkPX'						: 8.1, 	// Database
+		'TeradataConnectorPX'				: 8.1, 	// Database
+		'TeradataPX'						: 8.1, 	// Database
+		'UDBLoadPX'							: 8.1, 	// Database
+		'XPSLoadPX'							: 8.1, 	// Database
+		'PxColumnGenerator'					: 8.1, 	// Development/Debug
+		'PxHead'							: 8.1, 	// Development/Debug
+		'PxPeek'							: 8.1, 	// Development/Debug
+		'PxRowGenerator'					: 8.1, 	// Development/Debug
+		'PxSample'							: 8.1, 	// Development/Debug
+		'PxTail'							: 8.1, 	// Development/Debug
+		'PxWriteRangeMap'					: 8.1, 	// Development/Debug
+		'AmazonS3PX'						: 11.5, // File
+		'AzureBlobStorageConnectorPX'		: 11.7, // File 
+		'AzureFileStorageConnectorPX'		: 11.7, // File 
+		'AzureStorageConnectorPX'			: 11.7, // File  
+		'FileConnectorPX'					: 11.5, // File
+		'HDFSConnectorPX'					: 11.5, // File
+		'HDFSFileConnectorPX'				: 11.5, // File
+		'LocalFileConnectorPX'				: 11.5, // File
+		'PxBDFS'							: 9.1, 	// File
+		'PxCFF'								: 8.1, 	// File
+		'PxDataSet'							: 8.1, 	// File
+		'PxExternalSource'					: 8.1, 	// File
+		'PxExternalTarget'					: 8.1, 	// File
+		'PxFileSet'							: 8.1, 	// File
+		'PxLookupFileSet'					: 8.1, 	// File
+		'PxParSASDataSet'					: 8.1, 	// File
+		'PxSequentialFile'					: 8.1, 	// File
+		'PxzOSFile'							: 9.1, 	// File
+		'UnstructuredDataConnectorPX'		: 9.1, 	// File
+		'HiveMetastorePX'					: 11.5, // Hive
+		'ABAP_EXT_for_R3_PX'				: 8.1,	// Packs (SAP - Untested)
+		'BAPI_PACK_for_R3_PX'				: 8.1, 	// Packs (SAP - Untested)
+		'EssbaseConnectorPX'				: 11.5, // Packs
+		'ORAAppsPX'							: 11.5, // Packs
+		'orahrchy_PX'						: 11.5, // Packs
+		'PeoplesoftOnePX'					: 11.5, // Packs
+		'PS_HRYPX'							: 11.5, // Packs
+		'SALESFORCEJCConnectorPX'			: 11.5, // Packs
+		'Siebel_BCPX'						: 11.5, // Packs
+		'Siebel_DAPX'						: 11.5, // Packs
+		'Siebel_EIMPX'						: 11.5, // Packs
+		'CTransformerStage'					: 8.1, 	// Processing
+		'DMConnectorPX'						: 9.1, 	// Processing
+		'ftpPX'								: 8.1, 	// Processing
+		'PivotPX'							: 8.1, 	// Processing
+		'PxAggregator'						: 8.1, 	// Processing
+		'PxBLM'								: 9.1, 	// Processing
+		'PxChangeApply'						: 8.1, 	// Processing
+		'PxChangeCapture'					: 8.1, 	// Processing
+		'PxChecksum'						: 8.1, 	// Processing
+		'PxCompare'							: 8.1, 	// Processing
+		'PxCompress'						: 8.1, 	// Processing
+		'PxCopy'							: 8.1, 	// Processing
+		'PxDecode'							: 8.1, 	// Processing
+		'PxDifference'						: 8.1, 	// Processing
+		'PxEncode'							: 8.1, 	// Processing
+		'PxExpand'							: 8.1, 	// Processing
+		'PxExternalFilter'					: 8.1, 	// Processing
+		'PxFilter'							: 8.1, 	// Processing
+		'PxFTP'								: 8.1, 	// Processing
+		'PxFunnel'							: 8.1, 	// Processing
+		'PxGeneric'							: 8.1, 	// Processing
+		'PxJoin'							: 8.1, 	// Processing
+		'PxLookup'							: 8.1, 	// Processing
+		'PxMerge'							: 8.1, 	// Processing
+		'PxModify'							: 8.1, 	// Processing
+		'PxPivot'							: 8.1, 	// Processing
+		'PxRemDup'							: 8.1, 	// Processing
+		'PxSAS'								: 8.1, 	// Processing
+		'PxSCD'								: 8.1, 	// Processing
+		'PxSort'							: 8.1, 	// Processing
+		'PxSurrogateKeyGenerator'			: 8.1, 	// Processing
+		'PxSurrogateKeyGeneratorN'			: 8.1, 	// Processing
+		'PxSVTransformer'					: 8.1, 	// Processing
+		'PxSwitch'							: 8.1, 	// Processing
+		'PxWaveGenerator'					: 8.1, 	// Processing
+		'CDCTStagePX'						: 9.1, 	// Real Time
+		'DataMirrorCDC'						: 8.1, 	// Real Time
+		'ILOGJRulesConnectorPX'				: 9.1, 	// Real Time
+		'JAQLConnectorPX'					: 9.1, 	// Real Time
+		'JavaStagePX'						: 9.1, 	// Real Time
+		'JClientPX'							: 8.1, 	// Real Time
+		'JTransformerPX'					: 8.1, 	// Real Time
+		'KafkaConnectorPX'					: 11.5, // Real Time
+		'MQSeriesPX'						: 8.1, 	// Real Time
+		'PxRTIInput'						: 8.1, 	// Real Time
+		'PxRTIOutput'						: 8.1, 	// Real Time
+		'StreamsConnectorPX'				: 9.1, 	// Real Time
+		'WebSphereMQConnectorPX'			: 8.1, 	// Real Time
+		'WSClientPX'						: 8.1, 	// Real Time
+		'WSTransformerPX'					: 8.1, 	// Real Time
+		'XMLInputPX'						: 8.1, 	// Real Time
+		'XMLOutputPX'						: 8.1, 	// Real Time
+		'XMLStagePX'						: 9.1, 	// Real Time
+		'XMLTransformerPX'					: 8.1, 	// Real Time
+		'PxColumnExport'					: 8.1, 	// Restructure
+		'PxColumnImport'					: 8.1, 	// Restructure
+		'PxCombineRecords'					: 8.1, 	// Restructure
+		'PxMakeSubRec'						: 8.1, 	// Restructure
+		'PxMakeVect'						: 8.1, 	// Restructure
+		'PxPromoteSubRec'					: 8.1, 	// Restructure
+		'PxSplitSubRec'						: 8.1, 	// Restructure
+		'PxSplitVect'						: 8.1 	// Restructure
+	];
+	
+def builtinStagesOnly = [
+		'QSLegacy'							: ['8.1'], 	// Data Quality
+		'WAVES'								: ['8.1'], 	// Data Quality
+		'DataMirrorCDC'						: ['8.1'] 	// Real Time
+	];
+
+def xmetaVersionNum = 8.1;
+def xmetaVersionStr = item.xmetaVersion;
+if (xmetaVersionStr != null) {
+	def xmetaVersion = xmetaVersionStr.split(/\./);
+	if (xmetaVersion.size() >= 2) {
+		xmetaVersionNum = Double.parseDouble(xmetaVersion[0].toString() + "." + xmetaVersion[1].toString());
+	}
+}
+
+item.graph.V.stage.comply{"${it.reason}"} { 
+    
+    def presentSince = builtinStages[it.stageType];
+    
+    if (presentSince != null) {
+		if (xmetaVersionNum >= presentSince) {
+			def presentOnly = builtinStagesOnly[it.stageType];
+			if (presentOnly != null) {
+				it.presentOnly = presentOnly;				
+				if (presentOnly.contains(xmetaVersionNum.toString()) == false) {
+					it.reason = "${it.stageType} has been depricated in DataStage v${item.xmetaVersion}. Stage ${it.stageName} could be a custom stage.";
+					return false;
+				}
+			}
+		
+			return true;
+		}
+    }
+    
+	it.reason = "Stage ${it.stageName} is custom stage (${it.stageType}).";
+    return false;
+};

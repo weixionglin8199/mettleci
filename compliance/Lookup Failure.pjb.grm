@@ -1,0 +1,31 @@
+/*
+ * Identifies Lookup Stages with Lookup set to Fail
+ *
+ * Rationale:
+ * Lookup stages by default have reference links set to fail should a key lookup fail.
+ * This causes the job to abort unexpectedly which in most cases is not the behaviour 
+ * the developer intended. These lookup fails should be handled gracefully in the ETL
+ * job.
+ */
+
+item.graph.V.stage
+	.has('stageType', 'PxLookup')
+	.as("Lookup")
+	.in.pin
+	.filter{'fail'.equalsIgnoreCase(it.lookupFail)}
+    .out.metabag.filter{ metabag ->
+        
+        def lookupOptions = metabag."APT.LookupOptions"
+        
+        // check metabag for lookupoptions which only exists on reference links
+        if (lookupOptions) {
+            return true
+        }
+        return false
+        
+    }
+	.back("Lookup") 
+	.comply{"${config.readableStageTypes[it.stageType] ?: it.stageType} '${it.stageName}' is configured to 'fail' which may cause an unintentional job abort. "}
+
+
+
